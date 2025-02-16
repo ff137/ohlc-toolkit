@@ -1,0 +1,71 @@
+[tool.poetry]
+name = "ohlc-toolkit"
+version = "0.1.0"
+description = "A flexible toolkit for working with OHLC data and generating custom time frames from minute data."
+authors = ["Mourits de Beer <ff137@proton.me>"]
+license = "MIT"
+readme = "README.md"
+keywords = [
+    "ohlc",
+    "price",
+    "candlestick",
+    "financial",
+    "market-data",
+    "time-series",
+]
+repository = "https://github.com/ff137/ohlc-toolkit"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+loguru = ">=0.7.3"
+numpy = "^2.2.2"
+orjson = "^3.10.15"
+pandas = "^2.2.2"
+pyarrow = "^19.0.0"
+tqdm = "^4.66.4"
+pyspark = { version = ">=3.2.0", optional = true }
+ipyparallel = { version = "^9.0.0", optional = true }
+
+[tool.poetry.extras]
+spark = ["pyspark"]
+ipyparallel = ["ipyparallel"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
+pytest-ruff = "^0.4.1"
+ruff = "^0.9.4"
+
+[tool.ruff]
+lint.select = ["B006", "C", "D", "E", "F"]
+lint.ignore = [
+    "D203",
+    "D204",
+    "D213",
+    "D215",
+    "D400",
+    "D401",
+    "D404",
+    "D406",
+    "D407",
+    "D408",
+    "D409",
+    "D413",
+]
+include = ["src/*.py"]
+line-length = 88
+
+[tool.pytest.ini_options]
+testpaths = "tests"
+addopts = "--cov=src --cov-report term --ruff --ruff-format"
+
+[tool.coverage.run]
+omit = ["tests/*", "examples/*"]
+
+[tool.coverage.report]
+skip_covered = false
+show_missing = true
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"

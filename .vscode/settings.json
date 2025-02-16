@@ -1,0 +1,19 @@
+{
+    "cSpell.words": [
+        "addopts",
+        "ipyparallel",
+        "levelname",
+        "loguru",
+        "numpy",
+        "ohlc",
+        "patchers",
+        "pyarrow",
+        "pyspark",
+        "pytest",
+        "testpaths",
+        "timeframes",
+        "tqdm",
+        "wdhm",
+        "wdhms"
+    ]
+}
