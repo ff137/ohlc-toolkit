@@ -25,10 +25,10 @@ jobs:
           poetry install
       - name: Ruff check
         run: |
-          ruff format --check
-          ruff check .
+          poetry run ruff format --check
+          poetry run ruff check .
       - name: Run tests with pytest
-        run: pytest
+        run: poetry run pytest
 
   deploy:
     runs-on: ubuntu-latest
