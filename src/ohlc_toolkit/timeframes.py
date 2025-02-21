@@ -52,7 +52,6 @@ def parse_timeframe(timeframe: str) -> int:
     Raises:
         ValueError: If the format is invalid.
     """
-
     if not validate_timeframe_format(timeframe):
         raise ValueError(f"Invalid timeframe format: {timeframe}")
 
