@@ -52,10 +52,7 @@ jobs:
         run: |
           poetry build
       - name: Publish package distributions to TestPyPI
-        run: |
-          set +e
-          poetry publish --repository testpypi
-          if [ $? -ne 0 ]; then
-            echo "Warning: Package may already exist on TestPyPI. Continuing..."
-          fi
-          set -e
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
