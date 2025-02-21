@@ -16,7 +16,7 @@ keywords = [
 repository = "https://github.com/ff137/ohlc-toolkit"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 loguru = ">=0.7.3"
 numpy = "^2.2.2"
 orjson = "^3.10.15"
