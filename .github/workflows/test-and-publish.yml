@@ -36,6 +36,8 @@ jobs:
     environment:
       name: testpypi
       url: https://test.pypi.org/project/ohlc-toolkit
+    permissions:
+      id-token: write # Note: this permission is mandatory for trusted publishing
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
