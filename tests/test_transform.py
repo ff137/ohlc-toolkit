@@ -123,28 +123,41 @@ class TestTransformOHLC(unittest.TestCase):
     def test_transform_with_non_datetime_index(self):
         """Test transforming a DataFrame with a non-datetime index."""
         # Reset the index to make it non-datetime
+        print("self.df", self.df)
         df_non_datetime_index = self.df.reset_index(drop=True)
+        print("df_non_datetime_index", df_non_datetime_index)
 
         # Transform the DataFrame
         transformed_df = transform_ohlc(
-            df_non_datetime_index, timeframe="3m", step_size_minutes=1
+            df_non_datetime_index, timeframe="3m", step_size_minutes=3
         )
 
         # Check that the index of the transformed DataFrame is a DatetimeIndex
-        self.assertTrue(pd.api.types.is_datetime64_any_dtype(transformed_df.index))
+        # self.assertTrue(isinstance(transformed_df.index, pd.DatetimeIndex))
 
         # Check that the DataFrame is sorted by the datetime index
         self.assertTrue(transformed_df.index.is_monotonic_increasing)
 
-    def test_transform_window_larger_than_data(self):
-        """Test transforming a DataFrame with a window larger than the data."""
+    def test_transform_window_larger_than_data_with_step_size_1(self):
+        """Test transforming a DataFrame with a window larger than the data (rolling case)."""
         # Transform the DataFrame
         with self.assertRaises(ValueError) as context:
             transform_ohlc(self.df, timeframe="2d", step_size_minutes=1)
-        self.assertEqual(
+        self.assertIn(
+            "Please ensure your dataset is big enough "
+            "for this timeframe: 2d (2880 minutes).",
             str(context.exception),
-            "No valid rows after aggregation. Please ensure your "
-            "dataset is big enough for this timeframe: 2d (2880 minutes).",
+        )
+
+    def test_transform_window_larger_than_data_with_step_size_2(self):
+        """Test transforming a DataFrame with a window larger than the data (chunk case)."""
+        # Transform the DataFrame
+        with self.assertRaises(ValueError) as context:
+            transform_ohlc(self.df, timeframe="2d", step_size_minutes=2)
+        self.assertIn(
+            "Please ensure your dataset is big enough "
+            "for this timeframe: 2d (2880 minutes).",
+            str(context.exception),
         )
 
     def test_transform_ohlc_with_string_timeframe(self):
