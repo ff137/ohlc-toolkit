@@ -23,7 +23,7 @@ def infer_time_step(df: pd.DataFrame, logger: Logger) -> int:
         raise ValueError("Cannot infer time step from a single-row dataset.")
 
     time_step = int(pd.Series(time_diffs).mode()[0])  # Most frequent difference
-    logger.info(f"Inferred time step: {time_step} seconds")
+    logger.info("Inferred time step: {} seconds", time_step)
     return time_step
 
 
