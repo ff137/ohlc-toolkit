@@ -84,6 +84,35 @@ class TestLogConfig(unittest.TestCase):
                 serialize=unittest.mock.ANY,
             )
 
+    def side_effect_for_add(*args, **_):
+        """Raise PermissionError on the second call."""
+        if hasattr(log_config, "call_count"):
+            log_config.call_count += 1
+        else:
+            log_config.call_count = 1
+
+        if log_config.call_count == 2:
+            raise PermissionError("Mocked permission error")
+
+    @patch("loguru._logger.Logger.add", side_effect=side_effect_for_add)
+    @patch("loguru._logger.Logger.warning")
+    def test_file_logging_permission_error(self, mock_warning, _):
+        """Test that a warning is logged when PermissionError occurs."""
+        with patch.dict(os.environ, {"ENABLE_FILE_LOGGING": "TRUE"}):
+            importlib.reload(log_config)  # Reload the module to apply the env var
+            test_logger = log_config.get_logger("ohlc_toolkit.test_module")
+
+            # Trigger a log to ensure the logger is initialized
+            test_logger.info("Trigger log")
+
+            # Check that the warning about the PermissionError was logged
+            mock_warning.assert_called_with(
+                "Permission error caught when trying to create log file. "
+                "Continuing without file logging for `{}` in `{}`",
+                "ohlc_toolkit.test_module",
+                "ohlc_toolkit",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
