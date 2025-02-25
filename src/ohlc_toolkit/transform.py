@@ -82,14 +82,12 @@ def _drop_expected_nans(df: pd.DataFrame, logger: Logger) -> pd.DataFrame:
     """
     logger.debug("Dropping expected NaN values from the aggregated DataFrame")
     n = df.first_valid_index()  # Get the index of the first valid row
+    if n is None:
+        logger.error("No valid rows after aggregation.")
+        raise ValueError("No valid rows after aggregation.")
+
     n_pos = df.index.get_loc(n)
-    if n is not None:
-        return pd.concat([df.iloc[:n_pos].dropna(), df.iloc[n_pos:]])
-    else:
-        logger.error("No valid rows found in the aggregated DataFrame.")
-        raise ValueError(
-            "Something went wrong. No valid rows in the aggregated DataFrame."
-        )
+    return pd.concat([df.iloc[:n_pos].dropna(), df.iloc[n_pos:]])
 
 
 def transform_ohlc(
@@ -149,7 +147,13 @@ def transform_ohlc(
     df_agg = rolling_ohlc(df, timeframe_minutes)
 
     # Drop the expected NaNs
-    df_agg = _drop_expected_nans(df_agg, bound_logger)
+    try:
+        df_agg = _drop_expected_nans(df_agg, bound_logger)
+    except ValueError as e:
+        raise ValueError(
+            f"{str(e)} Please ensure your dataset is big enough "
+            f"for this timeframe: {timeframe} ({timeframe_minutes} minutes)."
+        ) from e
 
     # Cast the transformed DataFrame to the original DataFrame's data types
     df_agg = _cast_to_original_dtypes(df_input, df_agg)
