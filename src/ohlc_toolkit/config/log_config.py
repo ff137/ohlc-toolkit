@@ -107,8 +107,8 @@ def get_log_file_path(main_module_name) -> str:
     # The absolute path of this file's directory
     config_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Move up one level to get to the project root directory
-    base_dir = os.path.dirname(config_dir)
+    # Move up three levels to get to the project root directory
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(config_dir)))
 
     # Define the logging dir with
     log_dir = os.path.join(base_dir, f"logs/{main_module_name}")
