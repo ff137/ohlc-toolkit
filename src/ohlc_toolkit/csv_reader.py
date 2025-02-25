@@ -76,7 +76,7 @@ def read_ohlc_csv(
     )
 
     # Infer time step from data
-    time_step = infer_time_step(df, logger=bound_logger)
+    time_step_seconds = infer_time_step(df, logger=bound_logger)
 
     # Convert user-defined timeframe to seconds
     timeframe_seconds = None
@@ -86,10 +86,10 @@ def read_ohlc_csv(
 
         timeframe_seconds = parse_timeframe(timeframe)
 
-        validate_timeframe(time_step, timeframe_seconds, bound_logger)
+        validate_timeframe(time_step_seconds, timeframe_seconds, bound_logger)
 
     # Perform integrity checks
-    check_data_integrity(df, logger=bound_logger, time_step=time_step)
+    check_data_integrity(df, logger=bound_logger, time_step_seconds=time_step_seconds)
 
     bound_logger.info("OHLC data successfully loaded.")
     return df
