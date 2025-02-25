@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ohlc-toolkit"
-version = "0.1.1"
+version = "0.2.0"
 description = "A flexible toolkit for working with OHLC data and generating custom time frames from minute data."
 authors = ["Mourits de Beer <ff137@proton.me>"]
 license = "MIT"
