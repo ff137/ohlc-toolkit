@@ -57,7 +57,7 @@ def _cast_to_original_dtypes(
     Returns:
         pd.DataFrame: The transformed DataFrame with data types matching the original.
     """
-    LOGGER.debug("Resampled DataFrame after casting to original dtypes")
+    LOGGER.debug("Casting transformed DataFrame to original dtypes")
     for column in transformed_df.columns:
         if column in original_df.columns:
             transformed_df[column] = transformed_df[column].astype(
