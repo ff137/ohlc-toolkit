@@ -51,6 +51,7 @@ lint.ignore = [
     "D408",
     "D409",
     "D413",
+    "E501",
 ]
 include = ["src/*.py"]
 line-length = 88
