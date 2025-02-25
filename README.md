@@ -9,13 +9,16 @@ A flexible Python toolkit for working with OHLC (Open, High, Low, Close) market 
 ## Features
 
 - Read OHLC data from CSV files, with built-in data quality checks
+- Process high resolution data (e.g. 1-minute interval data) into any greater time frame
+  (e.g. turn 1-minute data into 15-minute, 1-hour, 4-hour, 1-day, etc.)
 
 Coming soon™️:
 
-- Process high resolution data (e.g. 1-minute interval data) into any greater time frame
-  (e.g. turn 1-minute or 1-hour data into 4-hour or 1-day data)
-- Calculate future returns from OHLC data
-- Compute technical indicators
+- Calculate technical indicators
+- Compute metrics for 'future' price-changes
+
+Essentially, the above features will provide you with the capability to generate input and output data for
+training a machine learning model to predict future price-changes based on technical indicators.
 
 ## Examples
 
