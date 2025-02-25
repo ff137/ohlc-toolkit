@@ -100,8 +100,8 @@ class TestTimeframes(unittest.TestCase):
         validate_timeframe(time_step, user_timeframe, logger)
 
         logger.warning.assert_called_with(
-            "Provided timeframe (25s) is not a multiple "
-            "of the time step (10s). Data may be incomplete."
+            "Note: Requested timeframe (25s) is not a multiple "
+            "of the time step (10s); values may not be suitable."
         )
 
 

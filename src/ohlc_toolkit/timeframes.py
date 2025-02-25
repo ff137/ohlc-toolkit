@@ -102,12 +102,12 @@ def validate_timeframe(time_step: int, user_timeframe: int, logger: Logger):
     """Ensure that the timeframe is valid given the time step."""
     if user_timeframe < time_step:
         raise ValueError(
-            f"Provided timeframe ({user_timeframe}s) should not be smaller "
+            f"Requested timeframe ({user_timeframe}s) should not be smaller "
             f"than time step ({time_step}s)."
         )
 
     if user_timeframe % time_step != 0:
         logger.warning(
-            f"Provided timeframe ({user_timeframe}s) is not a multiple "
-            f"of the time step ({time_step}s). Data may be incomplete."
+            f"Note: Requested timeframe ({user_timeframe}s) is not a multiple "
+            f"of the time step ({time_step}s); values may not be suitable."
         )
