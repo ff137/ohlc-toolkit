@@ -52,19 +52,22 @@ def read_ohlc_csv(
         "dtype": dtype,
     }
 
+    def _read_csv(header: Optional[int] = None) -> pd.DataFrame:
+        return pd.read_csv(**read_csv_params, header=header)
+
     # If header_row is provided, use it directly
     if header_row is not None:
-        df = pd.read_csv(**read_csv_params, header=header_row)
+        df = _read_csv(header=header_row)
     else:
         # User doesn't specify header - let's try reading without header first
         try:
-            df = pd.read_csv(**read_csv_params, header=None)
+            df = _read_csv(header=None)
         except FileNotFoundError as e:
             raise FileNotFoundError(f"File not found: {filepath}") from e
         except ValueError:
             # If that fails, try with header
             try:
-                df = pd.read_csv(**read_csv_params, header=0)
+                df = _read_csv(header=0)
             except ValueError as e:
                 raise ValueError(
                     f"Data for file {filepath} does not match expected schema. "
