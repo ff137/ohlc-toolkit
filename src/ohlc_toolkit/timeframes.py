@@ -108,6 +108,6 @@ def validate_timeframe(time_step: int, user_timeframe: int, logger: Logger):
 
     if user_timeframe % time_step != 0:
         logger.warning(
-            f"Provided timeframe ({user_timeframe}s) is not a multiple "
-            f"of the time step ({time_step}s). Data may be incomplete."
+            f"Note: Provided timeframe ({user_timeframe}s) is not a multiple "
+            f"of the time step ({time_step}s); values may not be suitable."
         )
