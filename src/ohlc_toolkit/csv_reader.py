@@ -19,8 +19,9 @@ LOGGER = get_logger(__name__)
 def read_ohlc_csv(
     filepath: str,
     timeframe: Optional[str] = None,
-    expected_columns: Optional[list[str]] = None,
+    *,
     header_row: Optional[int] = None,
+    columns: Optional[list[str]] = None,
     dtype: Optional[dict[str, str]] = None,
 ) -> pd.DataFrame:
     """Read OHLC data from a CSV file.
@@ -28,8 +29,8 @@ def read_ohlc_csv(
     Arguments:
         filepath (str): Path to the CSV file.
         timeframe (Optional[str]): User-defined timeframe (e.g., '1m', '5m', '1h').
-        expected_columns (Optional[list[str]]): The expected columns in the CSV file.
         header_row (Optional[int]): The row number to use as the header.
+        columns (Optional[list[str]]): The expected columns in the CSV file.
         dtype (Optional[dict[str, str]]): The data type for the columns.
 
     Returns:
@@ -38,8 +39,8 @@ def read_ohlc_csv(
     bound_logger = LOGGER.bind(body=filepath)
     bound_logger.info("Reading OHLC data")
 
-    if expected_columns is None:
-        expected_columns = EXPECTED_COLUMNS
+    if columns is None:
+        columns = EXPECTED_COLUMNS
     if dtype is None:
         dtype = {
             "timestamp": "int32",
@@ -47,7 +48,7 @@ def read_ohlc_csv(
 
     read_csv_params = {
         "filepath_or_buffer": filepath,
-        "names": expected_columns,
+        "names": columns,
         "dtype": dtype,
     }
 
@@ -68,7 +69,7 @@ def read_ohlc_csv(
                 raise ValueError(
                     f"Data for file {filepath} does not match expected schema. "
                     f"Please validate the file data aligns with the expected "
-                    f"columns ({expected_columns}) and data types ({dtype})"
+                    f"columns ({columns}) and data types ({dtype})"
                 ) from e
 
     bound_logger.debug(
