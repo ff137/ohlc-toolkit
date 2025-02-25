@@ -42,6 +42,26 @@ class TestLogConfig(unittest.TestCase):
             self.assertIn('"message":"Test message | extra info"', serialized_output)
             self.assertIn('"levelname":"INFO"', serialized_output)
 
+    @patch("sys.stdout.write")
+    def test_serialization_format_with_exception(self, mock_stdout):
+        """Test that logs with exceptions are serialized correctly."""
+        with patch.dict(os.environ, {"ENABLE_SERIALIZE_LOGS": "TRUE"}):
+            importlib.reload(log_config)  # Reload the module to apply the env var
+            test_logger = log_config.get_logger("ohlc_toolkit.test_module2")
+
+            try:
+                raise ValueError("An error occurred")
+            except ValueError:
+                test_logger.bind(body="extra info").exception("Test message")
+
+            # Check that the serialized log is written to stdout
+            self.assertTrue(mock_stdout.called)
+            serialized_output = mock_stdout.call_args[0][0]
+            self.assertIn('"message":"Test message | extra info"', serialized_output)
+            self.assertIn('"levelname":"ERROR"', serialized_output)
+            self.assertIn('"type":"ValueError"', serialized_output)
+            self.assertIn('"value":"An error occurred"', serialized_output)
+
     @patch(
         "os.path.join",
         return_value="/fake/path/to/logs/ohlc_toolkit/{time:YYYY-MM-DD}.log",
