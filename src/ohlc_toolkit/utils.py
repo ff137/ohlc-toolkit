@@ -1,13 +1,13 @@
 """This module contains utility functions for the OHLC toolkit."""
 
+from logging import Logger
 from typing import Optional
 
 import numpy as np
 import pandas as pd
-from loguru import logger
 
 
-def infer_time_step(df: pd.DataFrame) -> int:
+def infer_time_step(df: pd.DataFrame, logger: Logger) -> int:
     """Infer the time step by analyzing the timestamp column."""
     time_diffs = np.diff(df["timestamp"])
 
@@ -19,7 +19,9 @@ def infer_time_step(df: pd.DataFrame) -> int:
     return time_step
 
 
-def check_data_integrity(df: pd.DataFrame, time_step: Optional[int] = None):
+def check_data_integrity(
+    df: pd.DataFrame, logger: Logger, time_step: Optional[int] = None
+):
     """Perform basic data integrity checks on the OHLC dataset."""
     if df.isnull().values.any():
         logger.warning("Data contains null values.")
