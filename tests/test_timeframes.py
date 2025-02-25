@@ -101,7 +101,7 @@ class TestTimeframes(unittest.TestCase):
 
         logger.warning.assert_called_with(
             "Provided timeframe (25s) is not a multiple "
-            "of the inferred time step (10s). Data may be incomplete."
+            "of the time step (10s). Data may be incomplete."
         )
 
 

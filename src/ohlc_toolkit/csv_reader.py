@@ -13,14 +13,15 @@ from ohlc_toolkit.timeframes import (
 )
 from ohlc_toolkit.utils import check_data_integrity, infer_time_step
 
-logger = get_logger(__name__)
+LOGGER = get_logger(__name__)
 
 
 def read_ohlc_csv(
     filepath: str,
     timeframe: Optional[str] = None,
-    expected_columns: Optional[list[str]] = None,
+    *,
     header_row: Optional[int] = None,
+    columns: Optional[list[str]] = None,
     dtype: Optional[dict[str, str]] = None,
 ) -> pd.DataFrame:
     """Read OHLC data from a CSV file.
@@ -28,47 +29,55 @@ def read_ohlc_csv(
     Arguments:
         filepath (str): Path to the CSV file.
         timeframe (Optional[str]): User-defined timeframe (e.g., '1m', '5m', '1h').
-        expected_columns (Optional[list[str]]): The expected columns in the CSV file.
         header_row (Optional[int]): The row number to use as the header.
+        columns (Optional[list[str]]): The expected columns in the CSV file.
         dtype (Optional[dict[str, str]]): The data type for the columns.
 
     Returns:
         pd.DataFrame: Processed OHLC dataset.
     """
-    bound_logger = logger.bind(body=filepath)
+    bound_logger = LOGGER.bind(body=filepath)
     bound_logger.info("Reading OHLC data")
 
-    if expected_columns is None:
-        expected_columns = EXPECTED_COLUMNS
+    if columns is None:
+        columns = EXPECTED_COLUMNS
     if dtype is None:
         dtype = {
             "timestamp": "int32",
+            "open": "float32",
+            "high": "float32",
+            "low": "float32",
+            "close": "float32",
+            "volume": "float32",
         }
 
     read_csv_params = {
         "filepath_or_buffer": filepath,
-        "names": expected_columns,
+        "names": columns,
         "dtype": dtype,
     }
 
+    def _read_csv(header: Optional[int] = None) -> pd.DataFrame:
+        return pd.read_csv(**read_csv_params, header=header)
+
     # If header_row is provided, use it directly
     if header_row is not None:
-        df = pd.read_csv(**read_csv_params, header=header_row)
+        df = _read_csv(header=header_row)
     else:
         # User doesn't specify header - let's try reading without header first
         try:
-            df = pd.read_csv(**read_csv_params, header=None)
+            df = _read_csv(header=None)
         except FileNotFoundError as e:
             raise FileNotFoundError(f"File not found: {filepath}") from e
         except ValueError:
             # If that fails, try with header
             try:
-                df = pd.read_csv(**read_csv_params, header=0)
+                df = _read_csv(header=0)
             except ValueError as e:
                 raise ValueError(
                     f"Data for file {filepath} does not match expected schema. "
                     f"Please validate the file data aligns with the expected "
-                    f"columns ({expected_columns}) and data types ({dtype})"
+                    f"columns ({columns}) and data types ({dtype})"
                 ) from e
 
     bound_logger.debug(
@@ -76,7 +85,7 @@ def read_ohlc_csv(
     )
 
     # Infer time step from data
-    time_step = infer_time_step(df, logger=bound_logger)
+    time_step_seconds = infer_time_step(df, logger=bound_logger)
 
     # Convert user-defined timeframe to seconds
     timeframe_seconds = None
@@ -86,10 +95,16 @@ def read_ohlc_csv(
 
         timeframe_seconds = parse_timeframe(timeframe)
 
-        validate_timeframe(time_step, timeframe_seconds, bound_logger)
+        validate_timeframe(time_step_seconds, timeframe_seconds, bound_logger)
+
+    df = df.sort_values("timestamp")  # Ensure timestamp is sorted
 
     # Perform integrity checks
-    check_data_integrity(df, logger=bound_logger, time_step=time_step)
+    check_data_integrity(df, logger=bound_logger, time_step_seconds=time_step_seconds)
+
+    # Convert the timestamp column to a datetime index
+    df.index = pd.to_datetime(df["timestamp"], unit="s")
+    df.index.name = "datetime"
 
     bound_logger.info("OHLC data successfully loaded.")
     return df

@@ -23,12 +23,12 @@ def infer_time_step(df: pd.DataFrame, logger: Logger) -> int:
         raise ValueError("Cannot infer time step from a single-row dataset.")
 
     time_step = int(pd.Series(time_diffs).mode()[0])  # Most frequent difference
-    logger.info(f"Inferred time step: {time_step} seconds")
+    logger.info("Inferred time step: {} seconds", time_step)
     return time_step
 
 
 def check_data_integrity(
-    df: pd.DataFrame, logger: Logger, time_step: Optional[int] = None
+    df: pd.DataFrame, logger: Logger, time_step_seconds: Optional[int] = None
 ):
     """Perform basic data integrity checks on the OHLC dataset."""
     if df.isnull().values.any():
@@ -37,9 +37,13 @@ def check_data_integrity(
     if df["timestamp"].duplicated().any():
         logger.warning("Duplicate timestamps found in the dataset.")
 
-    if time_step:
+    if time_step_seconds:
         expected_timestamps = set(
-            range(df["timestamp"].min(), df["timestamp"].max() + time_step, time_step)
+            range(
+                df["timestamp"].min(),
+                df["timestamp"].max() + time_step_seconds,
+                time_step_seconds,
+            )
         )
         actual_timestamps = set(df["timestamp"])
         missing_timestamps = expected_timestamps - actual_timestamps
