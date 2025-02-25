@@ -1,5 +1,6 @@
 """Transform OHLC data."""
 
+import os
 from logging import Logger
 from typing import Union
 
@@ -143,9 +144,9 @@ def transform_ohlc(
         "Using timeframe of {} minutes for rolling aggregation", timeframe_minutes
     )
 
-    # The following cut-off was determined to be where chunk-based aggregation is faster
-    # than rolling aggregation. See scripts/experiment/chunk_vs_rolling_aggregation.py
-    chunk_cut_off = 18000
+    # The following default was determined to be where chunk-based aggregation is faster
+    # than rolling aggregation. See examples/experiment/chunk_vs_rolling_aggregation.py
+    chunk_cut_off = int(os.getenv("CHUNK_CUT_OFF", 18000))
     num_rows = len(df)
     num_chunks = num_rows // step_size_minutes
     if step_size_minutes == 1 or num_chunks > chunk_cut_off:
