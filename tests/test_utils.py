@@ -4,6 +4,7 @@ import unittest
 
 import pandas as pd
 
+from ohlc_toolkit.config.log_config import get_logger
 from ohlc_toolkit.utils import check_data_integrity, infer_time_step
 
 
@@ -12,6 +13,7 @@ class TestUtils(unittest.TestCase):
 
     def setUp(self):
         """Set up test data."""
+        self.logger = get_logger(__name__)
         self.df_valid = pd.DataFrame(
             {
                 "timestamp": [
@@ -47,25 +49,25 @@ class TestUtils(unittest.TestCase):
 
     def test_infer_time_step(self):
         """Test inferring time step."""
-        self.assertEqual(infer_time_step(self.df_valid), 60)
+        self.assertEqual(infer_time_step(self.df_valid, self.logger), 60)
 
         with self.assertRaises(ValueError):
-            infer_time_step(self.df_single_row)
+            infer_time_step(self.df_single_row, self.logger)
 
     def test_check_data_integrity(self):
         """Test checking data integrity."""
         # No warnings expected
-        check_data_integrity(self.df_valid, 60)
+        check_data_integrity(self.df_valid, self.logger, 60)
 
         # Check for null values
-        check_data_integrity(self.df_with_nulls)
+        check_data_integrity(self.df_with_nulls, self.logger, 60)
 
         # Check for duplicate timestamps
-        check_data_integrity(self.df_with_duplicates)
+        check_data_integrity(self.df_with_duplicates, self.logger, 60)
 
         # Check for missing timestamps
         df_missing_timestamps = self.df_valid.drop(2)
-        check_data_integrity(df_missing_timestamps, 60)
+        check_data_integrity(df_missing_timestamps, self.logger, 60)
 
 
 if __name__ == "__main__":
