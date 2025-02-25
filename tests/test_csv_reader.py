@@ -70,11 +70,23 @@ class TestCsvReader(unittest.TestCase):
             df = read_ohlc_csv(csv_file, timeframe="1m")
             pd.testing.assert_frame_equal(df, self.df_expected)
 
-    def test_read_ohlc_csv_invalid_timeframe(self):
+    def test_read_ohlc_csv_bad_timeframe_value(self):
         """Test reading a CSV file with an invalid timeframe."""
         with StringIO(self.csv_data) as csv_file:
-            with self.assertRaises(ValueError):
+            with self.assertRaises(ValueError) as context:
+                read_ohlc_csv(csv_file, timeframe="30s")
+            self.assertEqual(
+                str(context.exception),
+                "Provided timeframe (30s) cannot be smaller "
+                "than inferred time step (60s).",
+            )
+
+    def test_read_ohlc_csv_invalid_timeframe_format(self):
+        """Test reading a CSV file with an invalid timeframe."""
+        with StringIO(self.csv_data) as csv_file:
+            with self.assertRaises(ValueError) as context:
                 read_ohlc_csv(csv_file, timeframe="1x")
+            self.assertEqual(str(context.exception), "Invalid timeframe format: 1x")
 
     def test_read_ohlc_csv_non_multiple_timeframe(self):
         """Test reading a CSV file with a non-multiple timeframe."""

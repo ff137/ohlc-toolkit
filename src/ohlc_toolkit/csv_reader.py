@@ -41,7 +41,9 @@ def read_ohlc_csv(
     if expected_columns is None:
         expected_columns = EXPECTED_COLUMNS
     if dtype is None:
-        dtype = {"timestamp": "int32"}
+        dtype = {
+            "timestamp": "int32",
+        }
 
     read_csv_params = {
         "filepath_or_buffer": filepath,
@@ -56,11 +58,18 @@ def read_ohlc_csv(
         # User doesn't specify header - let's try reading without header first
         try:
             df = pd.read_csv(**read_csv_params, header=None)
-        except FileNotFoundError:
-            raise FileNotFoundError(f"File not found: {filepath}")
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"File not found: {filepath}") from e
         except ValueError:
             # If that fails, try with header
-            df = pd.read_csv(**read_csv_params, header=0)
+            try:
+                df = pd.read_csv(**read_csv_params, header=0)
+            except ValueError as e:
+                raise ValueError(
+                    f"Data for file {filepath} does not match expected schema. "
+                    f"Please validate the file data aligns with the expected "
+                    f"columns ({expected_columns}) and data types ({dtype})"
+                ) from e
 
     bound_logger.debug(
         f"Read {df.shape[0]} rows and {df.shape[1]} columns: {df.columns.tolist()}"

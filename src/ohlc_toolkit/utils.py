@@ -9,7 +9,15 @@ import pandas as pd
 
 def infer_time_step(df: pd.DataFrame, logger: Logger) -> int:
     """Infer the time step by analyzing the timestamp column."""
-    time_diffs = np.diff(df["timestamp"])
+    try:
+        time_diffs = np.diff(df["timestamp"])
+    except KeyError as e:
+        raise KeyError("Timestamp column not found in DataFrame.") from e
+    except TypeError as e:
+        raise TypeError(
+            "The provided timestamp column contains non-numeric values. "
+            "All values must be UNIX timestamps (seconds since epoch)."
+        ) from e
 
     if len(time_diffs) == 0:
         raise ValueError("Cannot infer time step from a single-row dataset.")

@@ -54,6 +54,29 @@ class TestUtils(unittest.TestCase):
         with self.assertRaises(ValueError):
             infer_time_step(self.df_single_row, self.logger)
 
+    def test_infer_time_step_invalid_timestamp_type(self):
+        """Test inferring time step with invalid timestamp type."""
+        df_invalid_timestamp_type = self.df_valid.copy()
+        df_invalid_timestamp_type["timestamp"] = df_invalid_timestamp_type[
+            "timestamp"
+        ].astype(str)
+        with self.assertRaises(TypeError) as context:
+            infer_time_step(df_invalid_timestamp_type, self.logger)
+        self.assertEqual(
+            str(context.exception),
+            "The provided timestamp column contains non-numeric values. "
+            "All values must be UNIX timestamps (seconds since epoch).",
+        )
+
+    def test_infer_time_step_missing_timestamp_column(self):
+        """Test inferring time step with missing timestamp column."""
+        df_missing_timestamp_column = self.df_valid.drop(columns=["timestamp"])
+        with self.assertRaises(KeyError) as context:
+            infer_time_step(df_missing_timestamp_column, self.logger)
+        self.assertEqual(
+            str(context.exception), "'Timestamp column not found in DataFrame.'"
+        )
+
     def test_check_data_integrity(self):
         """Test checking data integrity."""
         # No warnings expected
