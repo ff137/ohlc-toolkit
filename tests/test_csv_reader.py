@@ -43,6 +43,9 @@ class TestCsvReader(unittest.TestCase):
                 "volume": "float32",
             }
         )
+        # Set expected index:
+        self.df_expected.index = pd.to_datetime(self.df_expected["timestamp"], unit="s")
+        self.df_expected.index.name = "datetime"
 
     def test_read_ohlc_csv_valid_no_header(self):
         """Test reading a valid OHLC CSV file with no header."""

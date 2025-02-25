@@ -97,8 +97,14 @@ def read_ohlc_csv(
 
         validate_timeframe(time_step_seconds, timeframe_seconds, bound_logger)
 
+    df = df.sort_values("timestamp")  # Ensure timestamp is sorted
+
     # Perform integrity checks
     check_data_integrity(df, logger=bound_logger, time_step_seconds=time_step_seconds)
+
+    # Convert the timestamp column to a datetime index
+    df.index = pd.to_datetime(df["timestamp"], unit="s")
+    df.index.name = "datetime"
 
     bound_logger.info("OHLC data successfully loaded.")
     return df
