@@ -125,7 +125,11 @@ def transform_ohlc(
         raise ValueError(f"Invalid timeframe: {timeframe}")
 
     time_step_seconds = step_size_minutes * 60
-    validate_timeframe(time_step_seconds, timeframe_seconds, bound_logger)
+    validate_timeframe(
+        time_step=time_step_seconds,
+        user_timeframe=timeframe_minutes * 60,
+        logger=bound_logger,
+    )
 
     bound_logger.debug(
         "Using timeframe of {} minutes for rolling aggregation", timeframe_minutes
