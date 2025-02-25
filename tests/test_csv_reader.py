@@ -77,8 +77,7 @@ class TestCsvReader(unittest.TestCase):
                 read_ohlc_csv(csv_file, timeframe="30s")
             self.assertEqual(
                 str(context.exception),
-                "Provided timeframe (30s) cannot be smaller "
-                "than inferred time step (60s).",
+                "Provided timeframe (30s) should not be smaller than time step (60s).",
             )
 
     def test_read_ohlc_csv_invalid_timeframe_format(self):
