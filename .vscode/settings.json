@@ -1,6 +1,8 @@
 {
     "cSpell.words": [
         "addopts",
+        "bitstamp",
+        "btcusd",
         "ipyparallel",
         "levelname",
         "loguru",
@@ -14,8 +16,10 @@
         "pytest",
         "testpaths",
         "testpypi",
+        "timeframe",
         "timeframes",
         "tqdm",
+        "venv",
         "wdhm",
         "wdhms"
     ]
