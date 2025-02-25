@@ -13,7 +13,7 @@ from ohlc_toolkit.timeframes import (
 )
 from ohlc_toolkit.utils import check_data_integrity, infer_time_step
 
-logger = get_logger(__name__)
+LOGGER = get_logger(__name__)
 
 
 def read_ohlc_csv(
@@ -35,7 +35,7 @@ def read_ohlc_csv(
     Returns:
         pd.DataFrame: Processed OHLC dataset.
     """
-    bound_logger = logger.bind(body=filepath)
+    bound_logger = LOGGER.bind(body=filepath)
     bound_logger.info("Reading OHLC data")
 
     if expected_columns is None:
