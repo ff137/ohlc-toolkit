@@ -34,11 +34,9 @@ def rolling_ohlc(df_input: pd.DataFrame, timeframe_minutes: int) -> pd.DataFrame
         pd.DataFrame: The aggregated OHLC data, with same schema as the input DataFrame.
     """
     LOGGER.info(
-        "Computing OHLC for a rolling window of {} minutes over {} rows. "
-        "The ratio of rows to timeframe is {:.2f}.",
+        "Calculating OHLC using a {}-minute rolling window over {} rows.",
         timeframe_minutes,
         len(df_input),
-        len(df_input) // timeframe_minutes,
     )
     return df_input.rolling(timeframe_minutes).agg(
         {
@@ -162,10 +160,10 @@ def transform_ohlc(
     else:
         # Use chunk-based aggregation when data step is large relative to num rows
         bound_logger.info(
-            "Using chunk-based aggregation for step size: {}. "
-            "The {} rows yield {} chunks",
-            step_size_minutes,
+            "Performing chunk-based aggregation over {} rows "
+            "with a step size of {} minutes ({} chunks).",
             num_rows,
+            step_size_minutes,
             num_chunks,
         )
         aggregated_data = []
