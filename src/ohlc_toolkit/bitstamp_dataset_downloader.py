@@ -59,17 +59,23 @@ class BitstampDatasetDownloader:
         recent: bool = True,
         overwrite_bulk: bool = False,
         overwrite_recent: bool = True,
-    ) -> pd.DataFrame:
+        skip_read: bool = False,
+    ) -> pd.DataFrame | None:
         """Download the Bitstamp BTC/USD minute datasets.
 
         Args:
-            bulk: Whether to download the bulk dataset.
-            recent: Whether to download the recent dataset.
-            overwrite_bulk: Whether to overwrite the existing bulk dataset.
-            overwrite_recent: Whether to overwrite the existing recent dataset.
+            bulk: Whether to download the bulk dataset. Default is to skip bulk dataset.
+            recent: Whether to download the recent dataset. Default is True.
+            overwrite_bulk: Whether to overwrite the existing bulk dataset. By default
+                will not overwrite bulk data if it already exists.
+            overwrite_recent: Whether to overwrite the existing recent dataset. By default
+                will overwrite recent data if it already exists.
+            skip_read: Whether to skip reading the downloaded datasets into DataFrames.
+                Default behaviour will read and return the DataFrames.
 
         Returns:
-            pd.DataFrame: The downloaded datasets (merged if both ar requested).
+            pd.DataFrame: If skip_read = False, the downloaded datasets, merged if both
+                are requested. If skip_read = True, None is returned.
         """
         if not (bulk or recent):
             raise ValueError("At least one of 'bulk' or 'recent' must be True.")
@@ -88,9 +94,10 @@ class BitstampDatasetDownloader:
                 LOGGER.info("Downloading bulk dataset")
                 self._download_file(self.BITSTAMP_BULK_DATA_URL, bulk_file_path)
 
-            LOGGER.info("Reading bulk dataset into pandas DataFrame")
-            df_bulk = pd.read_csv(bulk_file_path, compression="gzip")
-            dataframes.append(df_bulk)
+            if not skip_read:
+                LOGGER.info("Reading bulk dataset into DataFrame")
+                df_bulk = pd.read_csv(bulk_file_path, compression="gzip")
+                dataframes.append(df_bulk)
 
         if recent:
             recent_file_name = self.BITSTAMP_RECENT_DATA_URL.split("/")[-1]
@@ -105,12 +112,12 @@ class BitstampDatasetDownloader:
                 LOGGER.info("Downloading recent dataset")
                 self._download_file(self.BITSTAMP_RECENT_DATA_URL, recent_file_path)
 
-            LOGGER.info("Reading recent dataset into pandas DataFrame")
-            df_recent = pd.read_csv(recent_file_path)
-            dataframes.append(df_recent)
+            if not skip_read:
+                LOGGER.info("Reading recent dataset into DataFrame")
+                df_recent = pd.read_csv(recent_file_path)
+                dataframes.append(df_recent)
 
-        LOGGER.info("Returning dataset")
-        return pd.concat(dataframes)
+        return pd.concat(dataframes) if dataframes else None
 
     def download_all_bitstamp_btcusd_minute_data(
         self,
