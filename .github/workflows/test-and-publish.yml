@@ -1,6 +1,9 @@
 name: Test and Publish
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -39,6 +42,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: [test]
+    if: github.event_name == 'pull_request' # Only run on PRs
     environment:
       name: testpypi
       url: https://test.pypi.org/project/ohlc-toolkit
