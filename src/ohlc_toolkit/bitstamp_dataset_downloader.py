@@ -33,11 +33,6 @@ class BitstampDatasetDownloader:
         total_size = int(response.headers.get("content-length", 0))
         block_size = 1024  # 1 Kibibyte
 
-        LOGGER.info(
-            "Downloading file ({} MB) to `{}`",
-            round(total_size / 1024 / 1024, 2),
-            output_path,
-        )
         with open(output_path, "wb") as file, tqdm(
             desc=output_path,
             total=total_size,
@@ -48,6 +43,14 @@ class BitstampDatasetDownloader:
             for data in response.iter_content(block_size):
                 file.write(data)
                 progress_bar.update(len(data))
+
+        # Get the actual file size using tqdm's n attribute
+        file_size_mb = progress_bar.n / (1024 * 1024)  # Convert to MB
+        LOGGER.info(
+            "Successfully downloaded file to `{}` ({:.2f} MB)",
+            output_path,
+            file_size_mb,
+        )
 
     def download_bitstamp_btcusd_minute_data(
         self,
