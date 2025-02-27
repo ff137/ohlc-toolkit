@@ -58,12 +58,10 @@ line-length = 88
 
 [tool.pytest.ini_options]
 testpaths = "tests"
-addopts = "--cov=src --cov-report term --ruff --ruff-format"
-
-[tool.coverage.run]
-omit = ["tests/*", "examples/*"]
+addopts = "--cov --cov-report term --ruff --ruff-format"
 
 [tool.coverage.report]
+omit = ["tests/*", "examples/*"]
 skip_covered = false
 show_missing = true
 
