@@ -6,30 +6,49 @@
 
 A flexible Python toolkit for working with OHLC (Open, High, Low, Close) market data.
 
-## Features
-
-- Read OHLC data from CSV files, with built-in data quality checks
-- Process high resolution data (e.g. 1-minute interval data) into any greater time frame
-  (e.g. turn 1-minute data into 15-minute, 1-hour, 4-hour, 1-day, etc.)
-
-Coming soon™️:
-
-- Calculate technical indicators
-- Compute metrics for 'future' price-changes
-
-Essentially, the above features will provide you with the capability to generate input and output data for
-training a machine learning model to predict future price-changes based on technical indicators.
-
-## Examples
-
-See the [examples](examples/README.md) directory for examples of how to use the toolkit.
-
 ## Installation
 
 The project is available on [PyPI](https://pypi.org/project/ohlc-toolkit/):
 
 ```bash
 pip install ohlc-toolkit
+```
+
+## Features
+
+- Read OHLC data from CSV files, with built-in data quality checks
+- Includes a downloader for sample datasets of BTC/USD 1-minute OHLC data from [ff137/bitstamp-btcusd-minute-data](https://github.com/ff137/bitstamp-btcusd-minute-data)
+- Process 1-minute OHLC data into whatever timeframe you want -- e.g. to 15-minute, 1-hour, 1-day,
+  or even arbitrary timeframe definitions like `3d1h7m`!
+
+Coming soon™️ (actively developing):
+
+- Calculate technical indicators
+- Compute metrics for 'future' price-changes
+
+All of the above features will enable you to generate extensive training data for machine learning models, whether for research or trading, to predict future price changes based on technical indicators.
+
+## Examples
+
+See the [examples](examples/README.md) directory for examples of how to use the toolkit.
+
+Run the example script to see how the toolkit works:
+
+```bash
+# Clone the repository
+git clone https://github.com/ff137/ohlc-toolkit.git
+cd ohlc-toolkit
+
+# Create and activate a virtual environment
+python -m venv .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install poetry
+poetry install
+
+# Run the example script
+python examples/basic_usage.py
 ```
 
 ## Support
