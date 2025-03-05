@@ -3,7 +3,7 @@
 from typing import Literal, Optional
 
 import pandas as pd
-import pandas_ta as ta
+from pandas_ta.performance import percent_return
 
 
 def calculate_percentage_return(
@@ -36,14 +36,20 @@ def calculate_percentage_return(
     # Calculate the length for percent return
     length = future_return_length // timestep_size
 
+    # Create kwargs for percent_return
+    kwargs = {}
+    if fillna is not None:
+        kwargs["fillna"] = fillna
+    if fill_method is not None:
+        kwargs["fill_method"] = fill_method
+
     # Calculate the percentage return using pandas_ta
-    pct_return = ta.percent_return(
+    pct_return = percent_return(
         close=close,
         length=length,
         cumulative=cumulative,
         offset=offset,
-        fillna=fillna,
-        fill_method=fill_method,
+        **kwargs,
     )
 
     return pct_return
