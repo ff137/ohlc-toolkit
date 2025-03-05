@@ -1,11 +1,14 @@
 {
     "cSpell.words": [
         "addopts",
+        "bfill",
         "bitstamp",
         "btcusd",
         "codacy",
         "dropna",
         "dtypes",
+        "ffill",
+        "fillna",
         "iloc",
         "ipyparallel",
         "levelname",
@@ -24,6 +27,7 @@
         "testpypi",
         "timeframe",
         "timeframes",
+        "timestep",
         "tqdm",
         "venv",
         "wdhm",
