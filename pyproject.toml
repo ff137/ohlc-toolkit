@@ -22,6 +22,7 @@ orjson = "^3.10.15"
 pandas = "^2.2.2"
 pandas-ta = { git = "https://github.com/twopirllc/pandas-ta.git", branch = "development" }
 requests = "^2.32.3"
+setuptools = "^75.8.2" # required by pandas-ta
 tqdm = "^4.66.4"
 # pyarrow = "^19.0.0"
 # pyspark = { version = ">=3.2.0", optional = true }
