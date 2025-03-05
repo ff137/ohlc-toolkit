@@ -18,10 +18,9 @@ repository = "https://github.com/ff137/ohlc-toolkit"
 [tool.poetry.dependencies]
 python = "^3.10"
 loguru = ">=0.7.3"
-numpy = "^2.2.2"
 orjson = "^3.10.15"
 pandas = "^2.2.2"
-pandas-ta = "^0.3.14b0"
+pandas-ta = { git = "https://github.com/twopirllc/pandas-ta.git", branch = "development" }
 requests = "^2.32.3"
 tqdm = "^4.66.4"
 # pyarrow = "^19.0.0"
