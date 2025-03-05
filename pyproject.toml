@@ -21,11 +21,11 @@ loguru = ">=0.7.3"
 numpy = "^2.2.2"
 orjson = "^3.10.15"
 pandas = "^2.2.2"
-# pyarrow = "^19.0.0"
+requests = "^2.32.3"
 tqdm = "^4.66.4"
+# pyarrow = "^19.0.0"
 # pyspark = { version = ">=3.2.0", optional = true }
 # ipyparallel = { version = "^9.0.0", optional = true }
-requests = "^2.32.3"
 
 [tool.poetry.extras]
 # spark = ["pyspark"]
