@@ -2,10 +2,20 @@
 
 from ohlc_toolkit.bitstamp_dataset_downloader import BitstampDatasetDownloader
 from ohlc_toolkit.csv_reader import read_ohlc_csv
+from ohlc_toolkit.timeframes import (
+    format_timeframe,
+    parse_timeframe,
+    validate_timeframe,
+    validate_timeframe_format,
+)
 from ohlc_toolkit.transform import transform_ohlc
 
 __all__ = [
     "BitstampDatasetDownloader",
     "read_ohlc_csv",
     "transform_ohlc",
+    "format_timeframe",
+    "parse_timeframe",
+    "validate_timeframe",
+    "validate_timeframe_format",
 ]
