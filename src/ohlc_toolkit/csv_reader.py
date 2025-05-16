@@ -57,6 +57,9 @@ def read_ohlc_csv(
         "dtype": dtype,
     }
 
+    if ".gz" in filepath:
+        read_csv_params["compression"] = "gzip"
+
     def _read_csv(header: Optional[int] = None) -> pd.DataFrame:
         return pd.read_csv(**read_csv_params, header=header)
 
