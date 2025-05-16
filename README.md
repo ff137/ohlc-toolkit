@@ -21,7 +21,7 @@ pip install ohlc-toolkit
 - Read OHLC data from CSV files, with built-in data quality checks
 - Includes a downloader for sample datasets of BTC/USD 1-minute OHLC data from [ff137/bitstamp-btcusd-minute-data](https://github.com/ff137/bitstamp-btcusd-minute-data)
 - Process 1-minute OHLC data into whatever timeframe you want -- e.g. to 15-minute, 1-hour, 1-day,
-  or even arbitrary timeframe definitions like `3d1h7m`!
+  or even arbitrary timeframe definitions like `1d3h7m`! Everything's possible!
 
 Coming soon™️ (actively developing):
 
