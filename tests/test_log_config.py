@@ -8,7 +8,7 @@ from unittest.mock import patch
 from loguru import logger
 
 import ohlc_toolkit.config.log_config as log_config
-from ohlc_toolkit.config.log_config import get_log_file_path, get_logger
+from ohlc_toolkit.config.log_config import _get_log_file_path, get_logger
 
 
 class TestLogConfig(unittest.TestCase):
@@ -25,7 +25,7 @@ class TestLogConfig(unittest.TestCase):
             os.path.dirname(os.path.dirname(__file__)),
             "logs/ohlc_toolkit/{time:YYYY-MM-DD}.log",
         )
-        actual_path = get_log_file_path("ohlc_toolkit")
+        actual_path = _get_log_file_path("ohlc_toolkit")
         self.assertEqual(expected_path, actual_path)
 
     @patch("sys.stdout.write")
