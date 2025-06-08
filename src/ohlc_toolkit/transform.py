@@ -6,6 +6,7 @@ from logging import Logger
 import pandas as pd
 
 from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.exceptions import DatasetEmptyError
 from ohlc_toolkit.timeframes import parse_timeframe, validate_timeframe
 from ohlc_toolkit.utils import check_data_integrity
 
@@ -91,7 +92,7 @@ def _drop_expected_nans(df: pd.DataFrame, logger: Logger) -> pd.DataFrame:
     n = df.first_valid_index()  # Get the index of the first valid row
     if n is None:
         logger.error("No valid rows after aggregation.")
-        raise ValueError("No valid rows after aggregation.")
+        raise DatasetEmptyError("No valid rows after aggregation.")
 
     n_pos = df.index.get_loc(n)
 
@@ -136,8 +137,7 @@ def transform_ohlc(
 
     try:
         df_agg = _drop_expected_nans(df_agg, bound_logger)
-    except ValueError as e:
-        # Aggregation resulted in no valid rows -- means dataset is too small
+    except DatasetEmptyError as e:
         raise ValueError(
             f"{e!s} Please ensure your dataset is big enough "
             f"for this timeframe: {timeframe} ({timeframe_minutes} minutes)."
