@@ -67,11 +67,13 @@ def read_ohlc_csv(
     else:
         # User doesn't specify header - let's try reading without header first
         try:
+            bound_logger.debug("Trying to read file without header")
             df = _read_csv(header=None)
         except FileNotFoundError as e:
             raise FileNotFoundError(f"File not found: {filepath}") from e
         except ValueError:
             # If that fails, try with header
+            bound_logger.debug("Trying to read file with header")
             try:
                 df = _read_csv(header=0)
             except ValueError as e:
