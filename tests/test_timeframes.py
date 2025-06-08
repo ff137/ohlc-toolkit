@@ -35,7 +35,12 @@ class TestTimeframes(unittest.TestCase):
         """Test parsing common timeframes."""
         for timeframe, expected_seconds in COMMON_TIMEFRAMES.items():
             with self.subTest(timeframe=timeframe):
-                self.assertEqual(parse_timeframe(timeframe), expected_seconds)
+                self.assertEqual(
+                    parse_timeframe(timeframe, to_minutes=False), expected_seconds
+                )
+                self.assertEqual(
+                    parse_timeframe(timeframe, to_minutes=True), expected_seconds // 60
+                )
 
     def test_parse_invalid_timeframes(self):
         """Test parsing invalid timeframe formats."""
@@ -55,23 +60,72 @@ class TestTimeframes(unittest.TestCase):
         for timeframe in invalid_timeframes:
             with self.subTest(timeframe=timeframe):
                 with self.assertRaises(ValueError):
-                    print(f"Testing {timeframe}")
                     parse_timeframe(timeframe)
 
-    def test_format_timeframe(self):
-        """Test formatting timeframes."""
+    def test_format_timeframe_with_seconds(self):
+        """Test formatting timeframes with seconds."""
         test_cases = common_timeframes_reversed | reversed_arbitrary_timeframes
         for seconds, expected_timeframe in test_cases.items():
             with self.subTest(seconds=seconds):
-                self.assertEqual(format_timeframe(seconds), expected_timeframe)
+                self.assertEqual(format_timeframe(seconds=seconds), expected_timeframe)
 
-    def test_format_timeframe_with_string_input(self):
-        """Test formatting timeframes with string input."""
+    def test_format_timeframe_with_string_seconds_input(self):
+        """Test formatting timeframes with string seconds input."""
         for seconds, expected_timeframe in common_timeframes_reversed.items():
             with self.subTest(seconds=seconds):
                 self.assertEqual(
-                    format_timeframe(expected_timeframe), expected_timeframe
+                    format_timeframe(seconds=str(seconds)), expected_timeframe
                 )
+
+    def test_format_timeframe_with_string_seconds_already_timeframe(self):
+        """Test formatting timeframes with string seconds input that is already a timeframe."""
+        for seconds, expected_timeframe in common_timeframes_reversed.items():
+            with self.subTest(seconds=seconds):
+                self.assertEqual(
+                    format_timeframe(seconds=expected_timeframe), expected_timeframe
+                )
+
+    def test_format_timeframe_with_invalid_string_seconds_input(self):
+        """Test formatting timeframes with invalid string seconds input."""
+        invalid_inputs = ["abc", "1.5", "one", "60seconds"]
+        for invalid_input in invalid_inputs:
+            with self.subTest(seconds=invalid_input):
+                with self.assertRaises(ValueError):
+                    format_timeframe(seconds=invalid_input)
+
+    def test_format_timeframe_with_minutes(self):
+        """Test formatting timeframes with minutes."""
+        test_cases = common_timeframes_reversed | reversed_arbitrary_timeframes
+        for seconds, expected_timeframe in test_cases.items():
+            minutes = seconds // 60
+            with self.subTest(minutes=minutes):
+                self.assertEqual(format_timeframe(minutes=minutes), expected_timeframe)
+
+    def test_format_timeframe_with_string_minutes_already_timeframe(self):
+        """Test formatting timeframes with string minutes input that is already a timeframe."""
+        for seconds, expected_timeframe in common_timeframes_reversed.items():
+            minutes = seconds // 60
+            with self.subTest(minutes=minutes):
+                self.assertEqual(
+                    format_timeframe(minutes=expected_timeframe), expected_timeframe
+                )
+
+    def test_format_timeframe_with_string_minutes_input(self):
+        """Test formatting timeframes with string minutes input."""
+        for seconds, expected_timeframe in common_timeframes_reversed.items():
+            minutes = seconds // 60
+            with self.subTest(minutes=minutes):
+                self.assertEqual(
+                    format_timeframe(minutes=str(minutes)), expected_timeframe
+                )
+
+    def test_format_timeframe_with_invalid_string_minutes_input(self):
+        """Test formatting timeframes with invalid string minutes input."""
+        invalid_inputs = ["abc", "1.5", "one", "60minutes"]
+        for invalid_input in invalid_inputs:
+            with self.subTest(minutes=invalid_input):
+                with self.assertRaises(ValueError):
+                    format_timeframe(minutes=invalid_input)
 
     def test_validate_timeframe_format(self):
         """Test validating timeframe format."""
