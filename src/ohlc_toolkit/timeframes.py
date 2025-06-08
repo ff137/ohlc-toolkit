@@ -105,6 +105,9 @@ def format_timeframe(
 
     seconds = minutes * 60 if minutes else seconds
 
+    if seconds is None:
+        raise ValueError("One of 'minutes' or 'seconds' must be provided.")
+
     if seconds in COMMON_TIMEFRAMES.values():
         # Return predefined common timeframes if found
         return {v: k for k, v in COMMON_TIMEFRAMES.items()}[seconds]
@@ -154,7 +157,7 @@ def validate_timeframe(time_step: int, user_timeframe: int, logger: Logger):
         )
 
 
-def _parse_time_input(time_input: int | str, time_type: str) -> int | str:
+def _parse_time_input(time_input: int | str | None, time_type: str) -> int | str | None:
     """Parse seconds or minutes inputs to int, or return string if already formatted."""
     if isinstance(time_input, str):
         # If string given - already formatted strings should just be returned
