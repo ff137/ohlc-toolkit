@@ -11,7 +11,7 @@ from ohlc_toolkit.config.log_config import get_logger
 LOGGER = get_logger(__name__)
 
 
-class BitstampDatasetDownloader:
+class DatasetDownloader:
     """Class for downloading Bitstamp datasets from https://github.com/ff137/bitstamp-btcusd-minute-data."""
 
     def __init__(self, data_dir: str = "data"):

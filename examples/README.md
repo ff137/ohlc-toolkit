@@ -40,15 +40,15 @@ data integrity checks. You're of course welcome to use your own dataset instead.
 
 #### Automated Download
 
-We have included a helper class, `BitstampDatasetDownloader`, in the toolkit to help automate the download process.
+We have included a helper class, `DatasetDownloader`, in the toolkit to help automate the download process.
 
 Here is how you can use it (this is included in the example script and doesn't need to be done manually):
 
 ```python
-from ohlc_toolkit.bitstamp_dataset_downloader import BitstampDatasetDownloader
+from ohlc_toolkit.bitstamp_dataset_downloader import DatasetDownloader
 
 # Initialize the downloader
-downloader = BitstampDatasetDownloader(data_dir="data")  # Configure your desired output directory
+downloader = DatasetDownloader(data_dir="data")  # Configure your desired output directory
 
 # Download the latest dataset
 df = downloader.download_bitstamp_btcusd_minute_data(recent=True, bulk=False)  # Set bulk to True to also download the full historical dataset (~90MB)
