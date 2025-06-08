@@ -39,17 +39,15 @@ def read_ohlc_csv(
     bound_logger = LOGGER.bind(body=filepath)
     bound_logger.info("Reading OHLC data")
 
-    if columns is None:
-        columns = EXPECTED_COLUMNS
-    if dtype is None:
-        dtype = {
-            "timestamp": "int32",
-            "open": "float32",
-            "high": "float32",
-            "low": "float32",
-            "close": "float32",
-            "volume": "float32",
-        }
+    columns = columns or EXPECTED_COLUMNS
+    dtype = dtype or {
+        "timestamp": "int32",
+        "open": "float32",
+        "high": "float32",
+        "low": "float32",
+        "close": "float32",
+        "volume": "float32",
+    }
 
     read_csv_params = {
         "filepath_or_buffer": filepath,
@@ -84,7 +82,7 @@ def read_ohlc_csv(
                 ) from e
 
     bound_logger.debug(
-        f"Read {df.shape[0]} rows and {df.shape[1]} columns: {df.columns.tolist()}"
+        "Read {} rows and {} columns: {}", df.shape[0], df.shape[1], df.columns.tolist()
     )
 
     # Infer time step from data

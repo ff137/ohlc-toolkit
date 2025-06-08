@@ -166,7 +166,7 @@ def transform_ohlc(
             step_size_minutes,
             num_chunks,
         )
-        aggregated_data = []
+        aggregated_data: list[dict[str, float]] = []
         for start in range(0, num_rows, step_size_minutes):
             end = start + timeframe_minutes
             if end > num_rows:

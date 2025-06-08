@@ -1,4 +1,4 @@
-"""Configuration for the ohlc_toolkit package."""
+"""Logger definitions and configuration."""
 
 import os
 import sys
@@ -24,17 +24,65 @@ color_map = {
 }
 
 
-def formatter_builder(color: str):
-    """Build a formatter for the logger."""
+# This will hold our logger instances
+loggers: dict[str, _Logger] = {}
+
+
+# Export this logger
+def get_logger(name: str) -> _Logger:
+    """Get a logger instance for the given name."""
+    main_module_name = _extract_main_module_name(name)
+
+    # Check if a logger for this name already exists
+    if main_module_name in loggers:
+        return loggers[main_module_name].bind(name=name)
+
+    logger_ = _create_logger_instance()
+
+    _configure_logger(logger_)
+
+    if not serialize:
+        _setup_stdout_logging(logger_, main_module_name)
+    else:
+        _setup_serialized_logging(logger_)
+
+    if ENABLE_FILE_LOGGING:
+        _setup_file_logging(logger_, main_module_name, name)
+
+    loggers[main_module_name] = logger_
+
+    return logger_.bind(name=name)
+
+
+def _extract_main_module_name(name: str) -> str:
+    return name.split(".")[0]
+
+
+def _create_logger_instance() -> _Logger:
+    return _Logger(
+        core=_Core(),
+        exception=None,
+        depth=0,
+        record=False,
+        lazy=False,
+        colors=False,
+        raw=False,
+        capture=True,
+        patchers=[],
+        extra={},
+    )
+
+
+def _configure_logger(logger_: _Logger):
+    logger_.configure(extra={"body": ""})
+
+
+# Define custom formatter for this module
+def _formatter_builder(color: str):
     return (
         "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
         "<level>{level: <8}</level> | "
-        f"<{color}>{{name}}</{color}>"
-        f":<{color}>"
-        f"{{function}}</{color}>"
-        f":<{color}>"
-        f"{{line}}</{color}>"
-        " | "
+        f"<{color}>{{name}}</{color}>:<{color}>{{function}}</{color}>:<{color}>{{line}}</{color}> | "
         "<level>{message}</level> | "
         "{extra[body]}"
     )
@@ -98,92 +146,55 @@ def _serialize_record(record):
     return "{extra[serialized]}\n"
 
 
-# This will hold our logger instances
-loggers = {}
+def _setup_stdout_logging(logger_: _Logger, main_module_name: str):
+    color = color_map.get(main_module_name, "blue")
+    formatter = _formatter_builder(color)
+    logger_.add(
+        sys.stdout,
+        level=STDOUT_LOG_LEVEL,
+        diagnose=True,
+        format=formatter,
+        colorize=colorize,
+    )
 
 
-def get_log_file_path(main_module_name) -> str:
-    """Get the log file path for the given module name."""
+def _setup_serialized_logging(logger_: _Logger):
+    logger_.add(
+        sys.stdout,
+        level=STDOUT_LOG_LEVEL,
+        diagnose=LOGURU_DIAGNOSE,
+        format=_serialize_record,
+    )
+
+
+def _get_log_file_path(main_module_name) -> str:
     # The absolute path of this file's directory
     config_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Move up three levels to get to the project root directory
-    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(config_dir)))
+    # Move up one level to get to the project root directory
+    base_dir = os.path.dirname(config_dir)
 
     # Define the logging dir with
     log_dir = os.path.join(base_dir, f"logs/{main_module_name}")
     return os.path.join(log_dir, "{time:YYYY-MM-DD}.log")
 
 
-def get_logger(name: str):
-    """Get a logger instance for the given module name."""
-    # Get the main module name
-    main_module_name = name.split(".")[0]
-
-    # Check if a logger for this name already exists
-    if main_module_name in loggers:
-        return loggers[main_module_name].bind(name=name)
-
-    # Create a new logger instance
-    logger_ = _Logger(
-        core=_Core(),
-        exception=None,
-        depth=0,
-        record=False,
-        lazy=False,
-        colors=False,
-        raw=False,
-        capture=True,
-        patchers=[],
-        extra={},
-    )
-
-    logger_.configure(extra={"body": ""})  # Default values for extra args
-
-    if not serialize:
-        # Get the color for this module and build formatter
-        color = color_map.get(main_module_name, "blue")  # Default to blue if no mapping
-        formatter = formatter_builder(color)
-
-        # Log to stdout
+def _setup_file_logging(logger_: _Logger, main_module_name: str, name: str):
+    try:
         logger_.add(
-            sys.stdout,
-            level=STDOUT_LOG_LEVEL,
-            diagnose=True,  # for local dev
-            format=formatter,
-            colorize=colorize,
+            _get_log_file_path(main_module_name),
+            rotation="00:00",
+            retention="7 days",
+            enqueue=True,
+            level=FILE_LOG_LEVEL,
+            diagnose=True,
+            format=_formatter_builder("blue"),
+            serialize=serialize,
         )
-    else:  # serialization is enabled:
-        logger_.add(
-            sys.stdout,
-            level=STDOUT_LOG_LEVEL,
-            diagnose=LOGURU_DIAGNOSE,  # default = disabled for serialized logs
-            format=_serialize_record,  # Use our custom serialization formatter
+    except PermissionError:
+        logger_.warning(
+            "Permission error caught when trying to create log file. "
+            "Continuing without file logging for `{}` in `{}`",
+            name,
+            main_module_name,
         )
-
-    # Log to a file
-    if ENABLE_FILE_LOGGING:
-        try:
-            logger_.add(
-                get_log_file_path(main_module_name),
-                rotation="00:00",  # new file is created at midnight
-                retention="7 days",  # keep logs for up to 7 days
-                enqueue=True,  # asynchronous
-                level=FILE_LOG_LEVEL,
-                diagnose=True,
-                format=formatter_builder("blue"),
-                serialize=serialize,
-            )
-        except PermissionError:
-            logger_.warning(
-                "Permission error caught when trying to create log file. "
-                "Continuing without file logging for `{}` in `{}`",
-                name,
-                main_module_name,
-            )
-
-    # Store the logger in the dictionary
-    loggers[main_module_name] = logger_
-
-    # Return a logger bound with the full name including the submodule
-    return logger_.bind(name=name)
