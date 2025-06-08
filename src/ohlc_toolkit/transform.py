@@ -157,7 +157,7 @@ def transform_ohlc(
 def _parse_timeframe_to_minutes(timeframe: int | str, logger: Logger) -> int:
     """Parse the timeframe to minutes."""
     if isinstance(timeframe, str):
-        timeframe_seconds = parse_timeframe(timeframe)
+        timeframe_seconds = parse_timeframe(timeframe, to_minutes=False)
         logger.debug("Parsed timeframe string to seconds: {}", timeframe_seconds)
         if timeframe_seconds % 60 != 0:
             logger.error("Second-level timeframes are not yet supported.")

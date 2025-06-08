@@ -88,7 +88,7 @@ def read_ohlc_csv(
         if not validate_timeframe_format(timeframe):
             raise ValueError(f"Invalid timeframe format: {timeframe}")
 
-        timeframe_seconds = parse_timeframe(timeframe)
+        timeframe_seconds = parse_timeframe(timeframe, to_minutes=False)
 
         validate_timeframe(time_step_seconds, timeframe_seconds, bound_logger)
 

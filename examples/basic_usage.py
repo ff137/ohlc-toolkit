@@ -1,4 +1,4 @@
-"""This script demonstrates basic functionality of `ohlc-toolkit`."""
+"""Example script to demonstrate basic functionality of `ohlc-toolkit`."""
 
 import ohlc_toolkit
 
