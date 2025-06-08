@@ -143,9 +143,10 @@ def validate_timeframe(time_step: int, user_timeframe: int, logger: Logger):
         )
 
     if user_timeframe % time_step != 0:
-        logger.warning(
-            f"Note: Requested timeframe ({user_timeframe}s) is not a multiple "
-            f"of the time step ({time_step}s); values may not be suitable."
+        logger.info(
+            "Note: Timeframe length ({} seconds) is not a multiple of the time step ({} seconds).",
+            user_timeframe,
+            time_step,
         )
 
 

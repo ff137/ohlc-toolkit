@@ -33,14 +33,14 @@ pip install ohlc-toolkit
 - Transform your candle data into any desired timeframe and resolution:
 
   ```py
-    # Convert 1-minute data into 5-minute data, maintaining a 1-minute resolution
+    # Convert 1-minute candle data into 5-minute candles (with candle updated every minute)
     df_5m = transform_ohlc(df_1min, timeframe=5, step_size_minutes=1)
 
-    # Convert 1-minute data into 1-day data, with a 1-day resolution
+    # Convert 1-minute candle data into 1-day candles (with candle updated every day)
     df_1d = transform_ohlc(df_1min, timeframe="1d", step_size_minutes=1440)  
   
     # Support for arbitrary timeframes is available!
-    df_arb = transform_ohlc(df_1min, timeframe="1d3h7m")
+    df_arb = transform_ohlc(df_1min, timeframe="1d3h7m", step_size_minutes=33)
   ```
 
 - Convert timeframe strings to the number of minutes, and vice versa:
