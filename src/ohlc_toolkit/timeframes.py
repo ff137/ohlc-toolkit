@@ -93,25 +93,16 @@ def format_timeframe(
         ValueError: If both or neither of minutes and seconds are provided.
 
     """
-    if minutes and seconds:
+    if (minutes is None) == (seconds is None):
         raise ValueError("One of 'minutes' or 'seconds' must be provided, not both.")
 
-    seconds = _parse_time_input(seconds, "seconds")
-    if isinstance(seconds, str):
-        return seconds  # Already formatted string
+    total_seconds = _get_seconds(minutes, seconds)
 
-    minutes = _parse_time_input(minutes, "minutes")
-    if isinstance(minutes, str):
-        return minutes  # Already formatted string
+    if isinstance(total_seconds, str):
+        return total_seconds
 
-    seconds = minutes * 60 if minutes else seconds
-
-    if seconds is None:
-        raise ValueError("One of 'minutes' or 'seconds' must be provided.")
-
-    if seconds in COMMON_TIMEFRAMES.values():
-        # Return predefined common timeframes if found
-        return {v: k for k, v in COMMON_TIMEFRAMES.items()}[seconds]
+    if total_seconds in COMMON_TIMEFRAMES.values():
+        return {v: k for k, v in COMMON_TIMEFRAMES.items()}[total_seconds]
 
     units = [
         ("w", WEEK_SECONDS),
@@ -123,7 +114,7 @@ def format_timeframe(
     parts = []
 
     for unit, unit_seconds in units:
-        value, seconds = divmod(seconds, unit_seconds)
+        value, total_seconds = divmod(total_seconds, unit_seconds)
         if value > 0:
             parts.append(f"{value}{unit}")
 
@@ -158,7 +149,7 @@ def validate_timeframe(time_step: int, user_timeframe: int, logger: Logger):
         )
 
 
-def _parse_time_input(time_input: int | str | None, time_type: str) -> int | str | None:
+def _parse_time_input(time_input: int | str, time_type: str) -> int | str:
     """Parse seconds or minutes inputs to int, or return string if already formatted."""
     if isinstance(time_input, str):
         # If string given - already formatted strings should just be returned
@@ -169,3 +160,17 @@ def _parse_time_input(time_input: int | str | None, time_type: str) -> int | str
         except ValueError:
             raise ValueError(f"Invalid {time_type} format: {time_input}") from None
     return time_input
+
+
+def _get_seconds(minutes: int | str | None, seconds: int | str | None) -> int | str:
+    if minutes is not None:
+        minutes = _parse_time_input(minutes, "minutes")
+        if isinstance(minutes, str):
+            return minutes
+        return minutes * 60
+    else:
+        assert seconds is not None
+        seconds = _parse_time_input(seconds, "seconds")
+        if isinstance(seconds, str):
+            return seconds
+        return seconds
