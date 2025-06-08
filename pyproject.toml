@@ -20,7 +20,6 @@ python = "^3.10"
 loguru = ">=0.7.3"
 orjson = "^3.10.15"
 pandas = "^2.3.0"
-pandas-ta-ff137 = { version = "==0.5.2", source = "testpypi" }
 requests = "^2.32.3"
 tqdm = "^4.66.4"
 # pyarrow = "^19.0.0"
