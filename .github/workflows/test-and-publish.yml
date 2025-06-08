@@ -31,6 +31,10 @@ jobs:
           poetry run ruff format --check
           poetry run ruff check .
 
+      - name: MyPy check
+        run: |
+          poetry run mypy . --ignore-missing-imports --check-untyped-defs
+
       - name: Run tests with pytest
         run: |
           poetry run pytest --cov-report=xml
