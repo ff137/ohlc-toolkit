@@ -5,8 +5,6 @@ import os
 import unittest
 from unittest.mock import patch
 
-from loguru import logger
-
 from ohlc_toolkit.config import logging
 from ohlc_toolkit.config.logging import _get_log_file_path, get_logger
 
@@ -17,7 +15,7 @@ class TestLogConfig(unittest.TestCase):
     def test_get_logger_instance(self):
         """Test that get_logger returns a logger instance."""
         test_logger = get_logger("ohlc_toolkit.test_module")
-        self.assertIsInstance(test_logger, logger.__class__)
+        self.assertIsInstance(test_logger, logging._Logger)
 
     def test_log_file_path(self):
         """Test that the log file path is correctly generated."""

@@ -3,7 +3,7 @@
 import os
 
 import pandas as pd
-from loguru import Logger
+from loguru._logger import Logger
 
 from ohlc_toolkit.config.logging import get_logger
 from ohlc_toolkit.exceptions import DatasetEmptyError

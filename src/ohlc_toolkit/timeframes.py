@@ -2,7 +2,7 @@
 
 import re
 
-from loguru import Logger
+from loguru._logger import Logger
 
 MINUTE_SECONDS = 60
 HOUR_MINUTES = 60
