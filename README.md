@@ -18,12 +18,27 @@ pip install ohlc-toolkit
 
 ## Features
 
-- Read OHLC data from CSV files, with built-in data quality checks
-- Includes a downloader for sample datasets of BTC/USD 1-minute OHLC data from [ff137/bitstamp-btcusd-minute-data](https://github.com/ff137/bitstamp-btcusd-minute-data)
-- Process 1-minute OHLC data into whatever timeframe you want -- e.g. to 15-minute, 1-hour, 1-day,
-  or even arbitrary timeframe definitions like `1d3h7m`! Everything's possible!
+- Read OHLC data from CSV files into pandas DataFrames, with built-in data quality checks:
 
-Coming soon™️ (actively developing):
+  ```py
+    df = read_ohlc_csv(csv_file_path, timeframe="1d")
+  ```
+
+- Download bulk 1-minute Bitstamp BTCUSD candle data in one line (using data from [ff137/bitstamp-btcusd-minute-data](https://github.com/ff137/bitstamp-btcusd-minute-data)):
+
+  ```py
+    df_1min = BitstampDatasetDownloader().download_bitstamp_btcusd_minute_data(bulk=True)
+  ```
+
+- Transform 1-minute data into any timeframe you like:
+
+  ```py
+    df_5m = transform_ohlc(df_1min, timeframe=5)  # 5-minute candle length, updated every minute
+    df_1h = transform_ohlc(df_1min, timeframe="1h", step_size_minutes=10)  # 1-hour data, updated every 10 minutes
+    df_arb = transform_ohlc(df_1min, timeframe="1d3h7m")  # Arbitrary timeframes are supported
+  ```
+
+🚧 Coming soon™️:
 
 - Calculate technical indicators
 - Compute metrics for 'future' price-changes
