@@ -1,4 +1,4 @@
-"""This module contains the tests for the ohlc_toolkit.csv_reader module."""
+"""Tests for the ohlc_toolkit.csv_reader module."""
 
 import unittest
 from unittest.mock import patch

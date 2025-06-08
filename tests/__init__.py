@@ -1,1 +1,1 @@
-"""This package contains the tests for the ohlc_toolkit package."""
+"""Tests for the ohlc_toolkit package."""

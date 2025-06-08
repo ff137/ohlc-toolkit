@@ -1,4 +1,4 @@
-"""This module contains tests for the transform_ohlc function."""
+"""Tests for the transform_ohlc function."""
 
 import unittest
 

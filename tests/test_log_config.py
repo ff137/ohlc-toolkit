@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from loguru import logger
 
-import ohlc_toolkit.config.log_config as log_config
+from ohlc_toolkit.config import log_config
 from ohlc_toolkit.config.log_config import _get_log_file_path, get_logger
 
 
@@ -91,7 +91,7 @@ class TestLogConfig(unittest.TestCase):
         else:
             log_config.call_count = 1
 
-        if log_config.call_count == 2:
+        if log_config.call_count == 2:  # noqa: PLR2004
             raise PermissionError("Mocked permission error")
 
     @patch("loguru._logger.Logger.add", side_effect=side_effect_for_add)

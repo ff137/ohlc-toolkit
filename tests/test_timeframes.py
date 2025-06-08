@@ -1,4 +1,4 @@
-"""This module contains tests for the timeframes module."""
+"""Tests for the timeframes module."""
 
 import unittest
 from unittest.mock import Mock

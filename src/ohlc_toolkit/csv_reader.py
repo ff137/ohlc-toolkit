@@ -1,6 +1,5 @@
 """Module for loading OHLC data from a CSV file."""
 
-
 import pandas as pd
 
 from ohlc_toolkit.config import DEFAULT_COLUMNS, DEFAULT_DTYPE
