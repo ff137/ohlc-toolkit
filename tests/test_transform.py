@@ -175,7 +175,7 @@ class TestTransformOHLC(unittest.TestCase):
     def test_transform_ohlc_with_float_timeframe(self):
         """Test transforming with a float timeframe."""
         with self.assertRaises(ValueError):
-            transform_ohlc(self.df, timeframe=3.5, step_size_minutes=1)
+            transform_ohlc(self.df, timeframe=3.5, step_size_minutes=1)  # type: ignore
 
     def test_invalid_timeframe(self):
         """Test with an invalid timeframe."""
