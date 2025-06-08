@@ -1,19 +1,19 @@
-"""Tests for the BitstampDatasetDownloader class."""
+"""Tests for the DatasetDownloader class."""
 
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
 
 import pandas as pd
 
-from ohlc_toolkit.bitstamp_dataset_downloader import BitstampDatasetDownloader
+from ohlc_toolkit.bitstamp_dataset_downloader import DatasetDownloader
 
 
-class TestBitstampDatasetDownloader(unittest.TestCase):
-    """Tests for the BitstampDatasetDownloader class."""
+class TestDatasetDownloader(unittest.TestCase):
+    """Tests for the DatasetDownloader class."""
 
     def setUp(self):
         """Set up the test case."""
-        self.downloader = BitstampDatasetDownloader(data_dir="test_data")
+        self.downloader = DatasetDownloader(data_dir="test_data")
 
     @patch("ohlc_toolkit.bitstamp_dataset_downloader.requests.get")
     @patch("builtins.open", new_callable=mock_open)

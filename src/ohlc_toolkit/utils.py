@@ -1,9 +1,8 @@
 """Utility functions for the OHLC toolkit."""
 
-from logging import Logger
-
 import numpy as np
 import pandas as pd
+from loguru._logger import Logger
 
 
 def infer_time_step(df: pd.DataFrame, logger: Logger) -> int:

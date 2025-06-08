@@ -1,11 +1,11 @@
 """Transform OHLC data."""
 
 import os
-from logging import Logger
 
 import pandas as pd
+from loguru._logger import Logger
 
-from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.config.logging import get_logger
 from ohlc_toolkit.exceptions import DatasetEmptyError
 from ohlc_toolkit.timeframes import parse_timeframe, validate_timeframe
 from ohlc_toolkit.utils import check_data_integrity
@@ -157,7 +157,7 @@ def transform_ohlc(
 def _parse_timeframe_to_minutes(timeframe: int | str, logger: Logger) -> int:
     """Parse the timeframe to minutes."""
     if isinstance(timeframe, str):
-        timeframe_seconds = parse_timeframe(timeframe)
+        timeframe_seconds = parse_timeframe(timeframe, to_minutes=False)
         logger.debug("Parsed timeframe string to seconds: {}", timeframe_seconds)
         if timeframe_seconds % 60 != 0:
             logger.error("Second-level timeframes are not yet supported.")

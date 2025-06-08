@@ -24,24 +24,49 @@ pip install ohlc-toolkit
     df = read_ohlc_csv(csv_file_path, timeframe="1d")
   ```
 
-- Download bulk 1-minute Bitstamp BTCUSD candle data in one line (using data from [ff137/bitstamp-btcusd-minute-data](https://github.com/ff137/bitstamp-btcusd-minute-data)):
+- Download BTCUSD 1-minute candle data in one line (using data from [ff137/bitstamp-btcusd-minute-data](https://github.com/ff137/bitstamp-btcusd-minute-data)):
 
   ```py
-    df_1min = BitstampDatasetDownloader().download_bitstamp_btcusd_minute_data(bulk=True)
+    df_1min = DatasetDownloader().download_bitstamp_btcusd_minute_data(bulk=True)
   ```
 
-- Transform 1-minute data into any timeframe you like:
+- Transform your candle data into any desired timeframe and resolution:
 
   ```py
-    df_5m = transform_ohlc(df_1min, timeframe=5)  # 5-minute candle length, updated every minute
-    df_1h = transform_ohlc(df_1min, timeframe="1h", step_size_minutes=10)  # 1-hour data, updated every 10 minutes
-    df_arb = transform_ohlc(df_1min, timeframe="1d3h7m")  # Arbitrary timeframes are supported
+    # Convert 1-minute data into 5-minute data, maintaining a 1-minute resolution
+    df_5m = transform_ohlc(df_1min, timeframe=5, step_size_minutes=1)
+
+    # Convert 1-minute data into 1-day data, with a 1-day resolution
+    df_1d = transform_ohlc(df_1min, timeframe="1d", step_size_minutes=1440)  
+  
+    # Support for arbitrary timeframes is available!
+    df_arb = transform_ohlc(df_1min, timeframe="1d3h7m")
+  ```
+
+- Convert timeframe strings to the number of minutes, and vice versa:
+
+  ```py
+    # From string to minutes
+    parse_timeframe("1h15m") == 75
+
+    # From minutes to string
+    format_timeframe(minutes=75) == "1h15m"
+  ```
+
+- Calculate future price changes:
+
+  ```py
+    # For every minute, compute the 1-hour percentage price change
+    df_future_returns = calculate_percentage_return(
+        df_1min["close"],  # Use the close price column
+        timestep_size=1,  # Compute returns at 1-minute resolution (same as input)
+        future_return_length=60,  # Compute price changes over 60 minutes
+    )
   ```
 
 🚧 Coming soon™️:
 
 - Calculate technical indicators
-- Compute metrics for 'future' price-changes
 
 All of the above features will enable you to generate extensive training data for machine learning models, whether for research or trading, to predict future price changes based on technical indicators.
 

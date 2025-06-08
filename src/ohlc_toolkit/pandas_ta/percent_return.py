@@ -8,10 +8,10 @@ from ohlc_toolkit.pandas_ta.utils import v_bool, v_offset, v_pos_default, v_seri
 
 def percent_return(
     close: Series,
-    length: int | None = None,
+    length: int = 1,
     cumulative: bool | None = None,
     offset: int | None = None,
-    fillna: str | None = None,
+    fillna: object | None = None,
 ) -> Series:
     """Percent Return.
 

@@ -12,7 +12,7 @@ def calculate_percentage_return(  # noqa: PLR0913
     future_return_length: int,
     cumulative: bool = False,
     offset: int = 0,
-    fillna: object = None,
+    fillna: object | None = None,
 ) -> pd.Series:
     """Calculate the percentage return of a series with customizable options.
 

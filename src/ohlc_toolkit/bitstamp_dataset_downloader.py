@@ -6,12 +6,12 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.config.logging import get_logger
 
 LOGGER = get_logger(__name__)
 
 
-class BitstampDatasetDownloader:
+class DatasetDownloader:
     """Class for downloading Bitstamp datasets from https://github.com/ff137/bitstamp-btcusd-minute-data."""
 
     def __init__(self, data_dir: str = "data"):

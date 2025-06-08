@@ -4,7 +4,7 @@ import unittest
 
 import pandas as pd
 
-from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.config.logging import get_logger
 from ohlc_toolkit.utils import check_data_integrity, infer_time_step
 
 

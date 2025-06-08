@@ -1,11 +1,14 @@
-"""This script demonstrates basic functionality of `ohlc-toolkit`."""
+"""Example script to demonstrate basic functionality of `ohlc-toolkit`."""
 
 import ohlc_toolkit
 
 ## First, download sample data
-downloader = ohlc_toolkit.BitstampDatasetDownloader()
+downloader = ohlc_toolkit.DatasetDownloader()
 downloader.download_bitstamp_btcusd_minute_data(
-    recent=True, skip_read=True, overwrite_recent=False  # skips if files already exist
+    bulk=False,  # Don't download the bulk dataset
+    recent=True,  # Download the recent data
+    overwrite_recent=False,  # Skips download if files already exist (set True to overwrite)
+    skip_read=True,  # Don't read the data into memory yet (we will read in the next step)
 )
 
 

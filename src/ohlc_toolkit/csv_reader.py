@@ -3,7 +3,7 @@
 import pandas as pd
 
 from ohlc_toolkit.config import DEFAULT_COLUMNS, DEFAULT_DTYPE
-from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.config.logging import get_logger
 from ohlc_toolkit.timeframes import (
     parse_timeframe,
     validate_timeframe,
@@ -88,7 +88,7 @@ def read_ohlc_csv(
         if not validate_timeframe_format(timeframe):
             raise ValueError(f"Invalid timeframe format: {timeframe}")
 
-        timeframe_seconds = parse_timeframe(timeframe)
+        timeframe_seconds = parse_timeframe(timeframe, to_minutes=False)
 
         validate_timeframe(time_step_seconds, timeframe_seconds, bound_logger)
 

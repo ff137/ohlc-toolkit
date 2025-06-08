@@ -1,4 +1,4 @@
-"""This script compares the time taken to compute OHLC data using the rolling window vs chunk-aggregation methods.
+"""Experimental script to compare runtime of rolling window vs chunk-aggregation methods for aggregating OHLC data.
 
 Results show that chunk-based aggregation may be faster when the number of chunks is less than 18000.
 """
@@ -9,7 +9,7 @@ import timeit
 import pandas as pd
 
 from ohlc_toolkit import read_ohlc_csv
-from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.config.logging import get_logger
 from ohlc_toolkit.transform import rolling_ohlc
 
 logger = get_logger(__name__)
@@ -25,9 +25,10 @@ step_sizes = [3, 4, 5, 6, 10, 15]
 def chunk_based_aggregation(df, timeframe_minutes, step_size_minutes):
     """Perform chunk-based aggregation."""
     logger.debug(
-        "Chunk-based aggregation: {}, {}. {} chunks".format(
-            timeframe_minutes, step_size_minutes, len(df) / step_size_minutes
-        )
+        "Chunk-based aggregation: {}, {}. {} chunks",
+        timeframe_minutes,
+        step_size_minutes,
+        len(df) / step_size_minutes,
     )
     aggregated_data = []
     for start in range(0, len(df), step_size_minutes):
@@ -65,7 +66,7 @@ rolling_time = (
     / 5
 )
 for step_size in step_sizes:
-    chunk_time = timeit.timeit(lambda: test_chunk_aggregation(step_size), number=3) / 3
+    chunk_time = timeit.timeit(lambda: test_chunk_aggregation(step_size), number=3) / 3  # noqa: B023
 
     print(f"Step size: {step_size} minutes")
     print(f"Rolling aggregation time: {rolling_time:.4f} seconds")
