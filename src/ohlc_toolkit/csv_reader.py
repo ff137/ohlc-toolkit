@@ -4,7 +4,7 @@ from typing import Optional
 
 import pandas as pd
 
-from ohlc_toolkit.config import EXPECTED_COLUMNS
+from ohlc_toolkit.config import DEFAULT_DTYPE, DEFAULT_COLUMNS
 from ohlc_toolkit.config.log_config import get_logger
 from ohlc_toolkit.timeframes import (
     parse_timeframe,
@@ -39,15 +39,8 @@ def read_ohlc_csv(
     bound_logger = LOGGER.bind(body=filepath)
     bound_logger.info("Reading OHLC data")
 
-    columns = columns or EXPECTED_COLUMNS
-    dtype = dtype or {
-        "timestamp": "int32",
-        "open": "float32",
-        "high": "float32",
-        "low": "float32",
-        "close": "float32",
-        "volume": "float32",
-    }
+    columns = columns or DEFAULT_COLUMNS
+    dtype = dtype or DEFAULT_DTYPE
 
     read_csv_params = {
         "filepath_or_buffer": filepath,
