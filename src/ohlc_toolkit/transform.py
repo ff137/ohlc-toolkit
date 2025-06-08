@@ -1,11 +1,11 @@
 """Transform OHLC data."""
 
 import os
-from logging import Logger
 
 import pandas as pd
+from loguru import Logger
 
-from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.config.logging import get_logger
 from ohlc_toolkit.exceptions import DatasetEmptyError
 from ohlc_toolkit.timeframes import parse_timeframe, validate_timeframe
 from ohlc_toolkit.utils import check_data_integrity

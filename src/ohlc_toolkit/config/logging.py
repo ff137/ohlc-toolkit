@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 
 import orjson
+from loguru import Logger
 from loguru._logger import Core as _Core
 from loguru._logger import Logger as _Logger
 
@@ -29,7 +30,7 @@ loggers: dict[str, _Logger] = {}
 
 
 # Export this logger
-def get_logger(name: str) -> _Logger:
+def get_logger(name: str) -> Logger:
     """Get a logger instance for the given name."""
     main_module_name = _extract_main_module_name(name)
 

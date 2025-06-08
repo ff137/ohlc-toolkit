@@ -1,7 +1,8 @@
 """Functions for parsing and formatting timeframes."""
 
 import re
-from logging import Logger
+
+from loguru import Logger
 
 MINUTE_SECONDS = 60
 HOUR_MINUTES = 60

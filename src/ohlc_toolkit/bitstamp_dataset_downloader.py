@@ -6,7 +6,7 @@ import pandas as pd
 import requests
 from tqdm import tqdm
 
-from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.config.logging import get_logger
 
 LOGGER = get_logger(__name__)
 

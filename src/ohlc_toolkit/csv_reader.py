@@ -3,7 +3,7 @@
 import pandas as pd
 
 from ohlc_toolkit.config import DEFAULT_COLUMNS, DEFAULT_DTYPE
-from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.config.logging import get_logger
 from ohlc_toolkit.timeframes import (
     parse_timeframe,
     validate_timeframe,

@@ -9,7 +9,7 @@ import timeit
 import pandas as pd
 
 from ohlc_toolkit import read_ohlc_csv
-from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.config.logging import get_logger
 from ohlc_toolkit.transform import rolling_ohlc
 
 logger = get_logger(__name__)
