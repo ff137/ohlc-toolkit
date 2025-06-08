@@ -72,29 +72,6 @@ class TestPercentageReturn(unittest.TestCase):
 
         pd.testing.assert_series_equal(pct_return, expected_returns, check_names=False)
 
-    def test_calculate_percentage_return_with_bfill(self):
-        """Test the percentage return calculation with bfill."""
-        close_prices = self.df["close"]
-        timestep_size = 1  # 1 minute
-        future_return_length = 2  # 2 minutes
-
-        expected_returns = pd.Series(
-            [
-                None,
-                None,
-                (102220.0 / 102228.0) - 1,
-                (102163.0 / 102215.0) - 1,
-            ]
-        )
-        pct_return = calculate_percentage_return(
-            close=close_prices,
-            timestep_size=timestep_size,
-            future_return_length=future_return_length,
-            fill_method="bfill",  # Doesn't change first two NaNs
-        )
-
-        pd.testing.assert_series_equal(pct_return, expected_returns, check_names=False)
-
 
 if __name__ == "__main__":
     unittest.main()

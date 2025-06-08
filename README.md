@@ -1,7 +1,7 @@
 # OHLC Toolkit
 
 [![PyPI](https://img.shields.io/pypi/v/ohlc-toolkit)](https://pypi.org/project/ohlc-toolkit/)
-![Python](https://img.shields.io/badge/python-3.12-blue.svg)
+[![Python](https://img.shields.io/pypi/pyversions/ohlc-toolkit.svg)](https://pypi.org/project/ohlc-toolkit/)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/0db6f73fe9bb4e8a8591055a6ea284f2)](https://app.codacy.com/gh/ff137/ohlc-toolkit/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/0db6f73fe9bb4e8a8591055a6ea284f2)](https://app.codacy.com/gh/ff137/ohlc-toolkit/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -18,12 +18,27 @@ pip install ohlc-toolkit
 
 ## Features
 
-- Read OHLC data from CSV files, with built-in data quality checks
-- Includes a downloader for sample datasets of BTC/USD 1-minute OHLC data from [ff137/bitstamp-btcusd-minute-data](https://github.com/ff137/bitstamp-btcusd-minute-data)
-- Process 1-minute OHLC data into whatever timeframe you want -- e.g. to 15-minute, 1-hour, 1-day,
-  or even arbitrary timeframe definitions like `3d1h7m`!
+- Read OHLC data from CSV files into pandas DataFrames, with built-in data quality checks:
 
-Coming soon™️ (actively developing):
+  ```py
+    df = read_ohlc_csv(csv_file_path, timeframe="1d")
+  ```
+
+- Download bulk 1-minute Bitstamp BTCUSD candle data in one line (using data from [ff137/bitstamp-btcusd-minute-data](https://github.com/ff137/bitstamp-btcusd-minute-data)):
+
+  ```py
+    df_1min = BitstampDatasetDownloader().download_bitstamp_btcusd_minute_data(bulk=True)
+  ```
+
+- Transform 1-minute data into any timeframe you like:
+
+  ```py
+    df_5m = transform_ohlc(df_1min, timeframe=5)  # 5-minute candle length, updated every minute
+    df_1h = transform_ohlc(df_1min, timeframe="1h", step_size_minutes=10)  # 1-hour data, updated every 10 minutes
+    df_arb = transform_ohlc(df_1min, timeframe="1d3h7m")  # Arbitrary timeframes are supported
+  ```
+
+🚧 Coming soon™️:
 
 - Calculate technical indicators
 - Compute metrics for 'future' price-changes

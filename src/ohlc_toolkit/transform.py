@@ -2,11 +2,11 @@
 
 import os
 from logging import Logger
-from typing import Union
 
 import pandas as pd
 
 from ohlc_toolkit.config.log_config import get_logger
+from ohlc_toolkit.exceptions import DatasetEmptyError
 from ohlc_toolkit.timeframes import parse_timeframe, validate_timeframe
 from ohlc_toolkit.utils import check_data_integrity
 
@@ -24,7 +24,7 @@ def _last(row: pd.Series) -> float:
 
 
 def rolling_ohlc(df_input: pd.DataFrame, timeframe_minutes: int) -> pd.DataFrame:
-    """Rolling OHLC aggregation.
+    """Apply rolling OHLC aggregation.
 
     Args:
         df_input (pd.DataFrame): The input DataFrame with OHLC data.
@@ -32,6 +32,7 @@ def rolling_ohlc(df_input: pd.DataFrame, timeframe_minutes: int) -> pd.DataFrame
 
     Returns:
         pd.DataFrame: The aggregated OHLC data, with same schema as the input DataFrame.
+
     """
     LOGGER.info(
         "Calculating OHLC using a {}-minute rolling window over {} rows.",
@@ -61,6 +62,7 @@ def _cast_to_original_dtypes(
 
     Returns:
         pd.DataFrame: The transformed DataFrame with data types matching the original.
+
     """
     LOGGER.debug("Casting transformed DataFrame to original dtypes")
     for column in transformed_df.columns:
@@ -84,12 +86,13 @@ def _drop_expected_nans(df: pd.DataFrame, logger: Logger) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: The DataFrame with expected NaNs dropped.
+
     """
     logger.debug("Dropping expected NaN values from the aggregated DataFrame")
     n = df.first_valid_index()  # Get the index of the first valid row
     if n is None:
         logger.error("No valid rows after aggregation.")
-        raise ValueError("No valid rows after aggregation.")
+        raise DatasetEmptyError("No valid rows after aggregation.")
 
     n_pos = df.index.get_loc(n)
 
@@ -98,7 +101,7 @@ def _drop_expected_nans(df: pd.DataFrame, logger: Logger) -> pd.DataFrame:
 
 
 def transform_ohlc(
-    df_input: pd.DataFrame, timeframe: Union[int, str], step_size_minutes: int = 1
+    df_input: pd.DataFrame, timeframe: int | str, step_size_minutes: int = 1
 ) -> pd.DataFrame:
     """Transform OHLC data to a different timeframe resolution.
 
@@ -110,6 +113,7 @@ def transform_ohlc(
 
     Returns:
         pd.DataFrame: Transformed OHLC data.
+
     """
     df = df_input.copy()
     bound_logger = LOGGER.bind(
@@ -117,39 +121,66 @@ def transform_ohlc(
     )
     bound_logger.debug("Starting transformation of OHLC data")
 
-    # Convert string timeframe to minutes if necessary
-    if isinstance(timeframe, str):
-        timeframe_seconds = parse_timeframe(timeframe)
-        bound_logger.debug("Parsed timeframe string to seconds: {}", timeframe_seconds)
-        if timeframe_seconds % 60 != 0:
-            bound_logger.error("Second-level timeframes are not yet supported.")
-            raise NotImplementedError("Second-level timeframes are not yet supported.")
-        timeframe_minutes = timeframe_seconds // 60
-    elif isinstance(timeframe, int):
-        timeframe_minutes = timeframe
-    else:
-        bound_logger.error("Invalid timeframe provided: {}", timeframe)
-        raise ValueError(f"Invalid timeframe: {timeframe}")
-
+    timeframe_minutes = _parse_timeframe_to_minutes(timeframe, bound_logger)
     time_step_seconds = step_size_minutes * 60
+
     validate_timeframe(
         time_step=time_step_seconds,
         user_timeframe=timeframe_minutes * 60,
         logger=bound_logger,
     )
 
-    bound_logger.debug(
-        "Using timeframe of {} minutes for rolling aggregation", timeframe_minutes
+    # Apply rolling or chunk-based aggregation to transform the data
+    df_agg = _aggregate_ohlc_data(
+        df, timeframe_minutes, step_size_minutes, bound_logger
     )
 
-    # The following default was determined to be where chunk-based aggregation is faster
-    # than rolling aggregation. See examples/experiment/chunk_vs_rolling_aggregation.py
-    chunk_cut_off = int(os.getenv("CHUNK_CUT_OFF", 18000))
+    try:
+        df_agg = _drop_expected_nans(df_agg, bound_logger)
+    except DatasetEmptyError as e:
+        raise ValueError(
+            f"{e!s} Please ensure your dataset is big enough "
+            f"for this timeframe: {timeframe} ({timeframe_minutes} minutes)."
+        ) from e
+
+    df_agg = _cast_to_original_dtypes(df_input, df_agg)
+
+    _ensure_datetime_index(df_input, df, bound_logger)
+
+    check_data_integrity(
+        df_agg, logger=bound_logger, time_step_seconds=time_step_seconds
+    )
+
+    return df_agg
+
+
+def _parse_timeframe_to_minutes(timeframe: int | str, logger: Logger) -> int:
+    """Parse the timeframe to minutes."""
+    if isinstance(timeframe, str):
+        timeframe_seconds = parse_timeframe(timeframe)
+        logger.debug("Parsed timeframe string to seconds: {}", timeframe_seconds)
+        if timeframe_seconds % 60 != 0:
+            logger.error("Second-level timeframes are not yet supported.")
+            raise NotImplementedError("Second-level timeframes are not yet supported.")
+        return timeframe_seconds // 60
+    elif isinstance(timeframe, int):
+        return timeframe
+    else:
+        logger.error("Invalid timeframe provided: {}", timeframe)
+        raise ValueError(f"Invalid timeframe: {timeframe}")
+
+
+def _aggregate_ohlc_data(
+    df: pd.DataFrame, timeframe_minutes: int, step_size_minutes: int, logger: Logger
+) -> pd.DataFrame:
+    """Aggregate OHLC data using either rolling or chunk-based aggregation."""
+    chunk_cut_off = int(os.getenv("CHUNK_CUT_OFF", "18000"))
     num_rows = len(df)
     num_chunks = num_rows // step_size_minutes
+
     if step_size_minutes == 1 or num_chunks > chunk_cut_off:
         # Use rolling aggregation for small step sizes or large datasets
-        bound_logger.debug(
+        logger.debug(
             "Using rolling aggregation for step size: {}. "
             "The number of rows would yield {} chunks",
             step_size_minutes,
@@ -159,71 +190,64 @@ def transform_ohlc(
         df_agg = df_agg.iloc[::step_size_minutes]
     else:
         # Use chunk-based aggregation when data step is large relative to num rows
-        bound_logger.info(
+        logger.info(
             "Performing chunk-based aggregation over {} rows "
             "with a step size of {} minutes ({} chunks).",
             num_rows,
             step_size_minutes,
             num_chunks,
         )
-        aggregated_data = []
-        for start in range(0, num_rows, step_size_minutes):
-            end = start + timeframe_minutes
-            if end > num_rows:
-                if not aggregated_data:
-                    bound_logger.error(
-                        "Selected timeframe is too large. {} rows are not enough for "
-                        "this timeframe: {} ({} minutes).",  # TODO: Assuming 1-minute.
-                        num_rows,
-                        timeframe,
-                        timeframe_minutes,
-                    )
-                    raise ValueError(
-                        "Timeframe too large. Please ensure your dataset is big enough "
-                        f"for this timeframe: {timeframe} ({timeframe_minutes} minutes)."
-                    )
-                break
-
-            window_df = df.iloc[start:end]
-            aggregated_row = {
-                "timestamp": window_df["timestamp"].iloc[-1],
-                "open": window_df["open"].iloc[0],
-                "high": window_df["high"].max(),
-                "low": window_df["low"].min(),
-                "close": window_df["close"].iloc[-1],
-                "volume": window_df["volume"].sum(),
-            }
-            aggregated_data.append(aggregated_row)
-
-        df_agg = pd.DataFrame(aggregated_data)
-        df_agg = df_agg.sort_values("timestamp")
-
-    # Drop the expected NaNs
-    try:
-        df_agg = _drop_expected_nans(df_agg, bound_logger)
-    except ValueError as e:
-        raise ValueError(
-            f"{str(e)} Please ensure your dataset is big enough "
-            f"for this timeframe: {timeframe} ({timeframe_minutes} minutes)."
-        ) from e
-
-    # Cast the transformed DataFrame to the original DataFrame's data types
-    df_agg = _cast_to_original_dtypes(df_input, df_agg)
-
-    # Do a check to ensure index of dataframe is a datetime index
-    if not pd.api.types.is_datetime64_any_dtype(df_input.index):
-        bound_logger.debug(
-            "DataFrame index is not a datetime index, sorting by timestamp"
+        df_agg = _chunk_based_aggregation(
+            df, timeframe_minutes, step_size_minutes, logger
         )
-        df = df.sort_values("timestamp")  # Ensure timestamp is sorted
-
-        # Convert the timestamp column to a datetime index
-        df.index = pd.to_datetime(df["timestamp"], unit="s")
-        df.index.name = "datetime"
-        bound_logger.debug("Converted timestamp column to datetime index")
-
-    check_data_integrity(
-        df_agg, logger=bound_logger, time_step_seconds=time_step_seconds
-    )
 
     return df_agg
+
+
+def _chunk_based_aggregation(
+    df: pd.DataFrame, timeframe_minutes: int, step_size_minutes: int, logger: Logger
+) -> pd.DataFrame:
+    """Perform chunk-based aggregation on the DataFrame."""
+    aggregated_data: list[dict[str, float]] = []
+    num_rows = len(df)
+
+    for start in range(0, num_rows, step_size_minutes):
+        end = start + timeframe_minutes
+        if end > num_rows:
+            if not aggregated_data:
+                logger.error(
+                    "Selected timeframe is too large. {} rows are not enough for "
+                    "this timeframe: {} ({} minutes).",
+                    num_rows,
+                    timeframe_minutes,
+                    timeframe_minutes,
+                )
+                raise ValueError(
+                    "Timeframe too large. Please ensure your dataset is big enough "
+                    f"for this timeframe: {timeframe_minutes} minutes."
+                )
+            break
+
+        window_df = df.iloc[start:end]
+        aggregated_row = {
+            "timestamp": window_df["timestamp"].iloc[-1],
+            "open": window_df["open"].iloc[0],
+            "high": window_df["high"].max(),
+            "low": window_df["low"].min(),
+            "close": window_df["close"].iloc[-1],
+            "volume": window_df["volume"].sum(),
+        }
+        aggregated_data.append(aggregated_row)
+
+    df_agg = pd.DataFrame(aggregated_data)
+    return df_agg.sort_values("timestamp")
+
+
+def _ensure_datetime_index(df_input: pd.DataFrame, df: pd.DataFrame, logger: Logger):
+    """Ensure the DataFrame index is a datetime index."""
+    if not pd.api.types.is_datetime64_any_dtype(df_input.index):
+        logger.debug("DataFrame index is not a datetime index, sorting by timestamp")
+        df.sort_values("timestamp", inplace=True)
+        df.index = pd.to_datetime(df["timestamp"], unit="s")
+        df.index.name = "datetime"
+        logger.debug("Converted timestamp column to datetime index")

@@ -1,4 +1,4 @@
-"""This module contains functions for parsing and formatting timeframes."""
+"""Functions for parsing and formatting timeframes."""
 
 import re
 from logging import Logger
@@ -51,6 +51,7 @@ def parse_timeframe(timeframe: str) -> int:
 
     Raises:
         ValueError: If the format is invalid.
+
     """
     if not validate_timeframe_format(timeframe):
         raise ValueError(f"Invalid timeframe format: {timeframe}")
@@ -62,15 +63,20 @@ def parse_timeframe(timeframe: str) -> int:
     return total_seconds
 
 
-def format_timeframe(seconds: int) -> str:
+def format_timeframe(seconds: int | str) -> str:
     """Convert a total number of seconds into a human-readable timeframe string.
 
     Arguments:
-        seconds (int): Total number of seconds.
+        seconds (int | str): Total number of seconds.
+            If a string is provided, it is assumed to be a valid timeframe string.
 
     Returns:
         str: Human-readable timeframe string (e.g., '1h', '4h30m').
+
     """
+    if isinstance(seconds, str):
+        return seconds
+
     if seconds in COMMON_TIMEFRAMES.values():
         # Return predefined common timeframes if found
         return {v: k for k, v in COMMON_TIMEFRAMES.items()}[seconds]
@@ -94,6 +100,7 @@ def validate_timeframe_format(timeframe: str) -> bool:
 
     Returns:
         bool: True if valid, False otherwise.
+
     """
     return bool(TIMEFRAME_FORMAT_PATTERN.fullmatch(timeframe))
 

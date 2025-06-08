@@ -1,10 +1,11 @@
-"""This module contains the tests for the ohlc_toolkit.csv_reader module."""
+"""Tests for the ohlc_toolkit.csv_reader module."""
 
 import unittest
-from io import StringIO
+from unittest.mock import patch
 
 import pandas as pd
 
+from ohlc_toolkit.config import DEFAULT_COLUMNS, DEFAULT_DTYPE
 from ohlc_toolkit.csv_reader import read_ohlc_csv
 
 
@@ -13,11 +14,6 @@ class TestCsvReader(unittest.TestCase):
 
     def setUp(self):
         """Set up test data."""
-        self.csv_data = """1736208060,102228.0,102228.0,102228.0,102228.0,0.00114705
-1736208120,102214.0,102225.0,102214.0,102215.0,0.42548035
-1736208180,102214.0,102220.0,102214.0,102220.0,0.24356262
-1736208240,102214.0,102214.0,102163.0,102163.0,0.03850259
-"""
         self.csv_data_no_header_path = "tests/test_data/test_csv_no_header.csv"
         self.csv_data_w_header_path = "tests/test_data/test_csv_w_header.csv"
         self.csv_bad_data_path = "tests/test_data/test_bad_data.csv"
@@ -79,33 +75,42 @@ class TestCsvReader(unittest.TestCase):
 
     def test_read_ohlc_csv_with_timeframe(self):
         """Test reading a CSV file with a valid timeframe."""
-        with StringIO(self.csv_data) as csv_file:
-            df = read_ohlc_csv(csv_file, timeframe="1m")
-            pd.testing.assert_frame_equal(df, self.df_expected)
+        df = read_ohlc_csv(self.csv_data_no_header_path, timeframe="1m")
+        pd.testing.assert_frame_equal(df, self.df_expected)
 
     def test_read_ohlc_csv_bad_timeframe_value(self):
         """Test reading a CSV file with an invalid timeframe."""
-        with StringIO(self.csv_data) as csv_file:
-            with self.assertRaises(ValueError) as context:
-                read_ohlc_csv(csv_file, timeframe="30s")
-            self.assertEqual(
-                str(context.exception),
-                "Requested timeframe (30s) should not be smaller than time step (60s).",
-            )
+        with self.assertRaises(ValueError) as context:
+            read_ohlc_csv(self.csv_data_no_header_path, timeframe="30s")
+        self.assertEqual(
+            str(context.exception),
+            "Requested timeframe (30s) should not be smaller than time step (60s).",
+        )
 
     def test_read_ohlc_csv_invalid_timeframe_format(self):
         """Test reading a CSV file with an invalid timeframe."""
-        with StringIO(self.csv_data) as csv_file:
-            with self.assertRaises(ValueError) as context:
-                read_ohlc_csv(csv_file, timeframe="1x")
-            self.assertEqual(str(context.exception), "Invalid timeframe format: 1x")
+        with self.assertRaises(ValueError) as context:
+            read_ohlc_csv(self.csv_data_no_header_path, timeframe="1x")
+        self.assertEqual(str(context.exception), "Invalid timeframe format: 1x")
 
     def test_read_ohlc_csv_non_multiple_timeframe(self):
         """Test reading a CSV file with a non-multiple timeframe."""
-        with StringIO(self.csv_data) as csv_file:
-            # This should not raise an error but log a warning
-            df = read_ohlc_csv(csv_file, timeframe="70s")
-            pd.testing.assert_frame_equal(df, self.df_expected)
+        df = read_ohlc_csv(self.csv_data_no_header_path, timeframe="70s")
+        pd.testing.assert_frame_equal(df, self.df_expected)
+
+    @patch("pandas.read_csv")
+    def test_read_ohlc_csv_with_gzip_compression(self, mock_read_csv):
+        """Test reading a CSV file with gzip compression."""
+        with patch("ohlc_toolkit.csv_reader.infer_time_step") as mock_infer_time_step:
+            read_ohlc_csv("test_csv_data.gz")
+            mock_read_csv.assert_called_once_with(
+                filepath_or_buffer="test_csv_data.gz",
+                names=DEFAULT_COLUMNS,
+                dtype=DEFAULT_DTYPE,
+                header=None,
+                compression="gzip",
+            )
+        assert mock_infer_time_step.call_count == 1
 
 
 if __name__ == "__main__":

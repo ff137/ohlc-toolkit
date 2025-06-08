@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ohlc-toolkit"
-version = "0.3.2"
+version = "0.3.3"
 description = "A flexible toolkit for working with OHLC data and generating custom timeframes from minute data."
 authors = ["Mourits de Beer <ff137@proton.me>"]
 license = "MIT"
@@ -19,8 +19,7 @@ repository = "https://github.com/ff137/ohlc-toolkit"
 python = "^3.10"
 loguru = ">=0.7.3"
 orjson = "^3.10.15"
-pandas = "^2.2.2"
-pandas-ta-ff137 = { version = "==0.5.1", source = "testpypi" }
+pandas = "^2.3.0"
 requests = "^2.32.3"
 tqdm = "^4.66.4"
 # pyarrow = "^19.0.0"
@@ -32,30 +31,34 @@ tqdm = "^4.66.4"
 # ipyparallel = ["ipyparallel"]
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
+pytest = "^8.4.0"
 pytest-cov = "^6.0.0"
 pytest-ruff = "^0.4.1"
 ruff = "^0.11.0"
 
 [tool.ruff]
-lint.select = ["B006", "C", "D", "E", "F"]
+line-length = 88
+lint.pycodestyle.max-line-length = 120
+target-version = "py312"
+lint.select = [
+    "E",   # pycodestyle errors (style errors)
+    "W",   # pycodestyle warnings (style warnings)
+    "F",   # pyflakes (detect invalid Python code)
+    "I",   # isort (import sorting)
+    "B",   # flake8-bugbear (detect likely bugs)
+    "C",   # mccabe (code complexity)
+    "N",   # pep8-naming (naming conventions)
+    "D",   # pydocstyle (docstring style)
+    "UP",  # pyupgrade (upgrade syntax)
+    "PL",  # pylint
+    "RUF", # ruff-specific rules
+]
 lint.ignore = [
-    "D203",
-    "D204",
-    "D213",
-    "D215",
-    "D400",
-    "D401",
-    "D404",
-    "D406",
-    "D407",
-    "D408",
-    "D409",
-    "D413",
-    "E501",
+    "D203",    # 1 blank line required before class docstring
+    "D213",    # Multi-line docstring summary should start at the second line
+    "PLE1205", # False positive: Too many arguments for `logging` format string
 ]
 include = ["src/*.py"]
-line-length = 88
 
 [tool.pytest.ini_options]
 testpaths = "tests"

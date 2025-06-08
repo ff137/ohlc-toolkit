@@ -1,4 +1,4 @@
-"""This module contains functions for loading OHLC data from a CSV file."""
+"""Functions for loading OHLC data from a CSV file."""
 
 import os
 
@@ -79,6 +79,7 @@ class BitstampDatasetDownloader:
         Returns:
             pd.DataFrame: If skip_read = False, the downloaded datasets, merged if both
                 are requested. If skip_read = True, None is returned.
+
         """
         if not (bulk or recent):
             raise ValueError("At least one of 'bulk' or 'recent' must be True.")
@@ -136,6 +137,7 @@ class BitstampDatasetDownloader:
 
         Returns:
             pd.DataFrame: The downloaded datasets.
+
         """
         return self.download_bitstamp_btcusd_minute_data(
             bulk=True,

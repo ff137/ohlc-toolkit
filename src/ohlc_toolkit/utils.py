@@ -1,7 +1,6 @@
-"""This module contains utility functions for the OHLC toolkit."""
+"""Utility functions for the OHLC toolkit."""
 
 from logging import Logger
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -28,7 +27,7 @@ def infer_time_step(df: pd.DataFrame, logger: Logger) -> int:
 
 
 def check_data_integrity(
-    df: pd.DataFrame, logger: Logger, time_step_seconds: Optional[int] = None
+    df: pd.DataFrame, logger: Logger, time_step_seconds: int | None = None
 ):
     """Perform basic data integrity checks on the OHLC dataset."""
     if df.isnull().values.any():

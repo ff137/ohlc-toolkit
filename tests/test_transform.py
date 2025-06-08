@@ -1,4 +1,4 @@
-"""This module contains tests for the transform_ohlc function."""
+"""Tests for the transform_ohlc function."""
 
 import unittest
 
@@ -156,7 +156,7 @@ class TestTransformOHLC(unittest.TestCase):
             transform_ohlc(self.df, timeframe="2d", step_size_minutes=2)
         self.assertIn(
             "Please ensure your dataset is big enough "
-            "for this timeframe: 2d (2880 minutes).",
+            "for this timeframe: 2880 minutes.",
             str(context.exception),
         )
 

@@ -1,10 +1,8 @@
 """Module for loading OHLC data from a CSV file."""
 
-from typing import Optional
-
 import pandas as pd
 
-from ohlc_toolkit.config import EXPECTED_COLUMNS
+from ohlc_toolkit.config import DEFAULT_COLUMNS, DEFAULT_DTYPE
 from ohlc_toolkit.config.log_config import get_logger
 from ohlc_toolkit.timeframes import (
     parse_timeframe,
@@ -18,11 +16,11 @@ LOGGER = get_logger(__name__)
 
 def read_ohlc_csv(
     filepath: str,
-    timeframe: Optional[str] = None,
+    timeframe: str | None = None,
     *,
-    header_row: Optional[int] = None,
-    columns: Optional[list[str]] = None,
-    dtype: Optional[dict[str, str]] = None,
+    header_row: int | None = None,
+    columns: list[str] | None = None,
+    dtype: dict[str, str] | None = None,
 ) -> pd.DataFrame:
     """Read OHLC data from a CSV file.
 
@@ -35,21 +33,13 @@ def read_ohlc_csv(
 
     Returns:
         pd.DataFrame: Processed OHLC dataset.
+
     """
     bound_logger = LOGGER.bind(body=filepath)
     bound_logger.info("Reading OHLC data")
 
-    if columns is None:
-        columns = EXPECTED_COLUMNS
-    if dtype is None:
-        dtype = {
-            "timestamp": "int32",
-            "open": "float32",
-            "high": "float32",
-            "low": "float32",
-            "close": "float32",
-            "volume": "float32",
-        }
+    columns = columns or DEFAULT_COLUMNS
+    dtype = dtype or DEFAULT_DTYPE
 
     read_csv_params = {
         "filepath_or_buffer": filepath,
@@ -57,7 +47,10 @@ def read_ohlc_csv(
         "dtype": dtype,
     }
 
-    def _read_csv(header: Optional[int] = None) -> pd.DataFrame:
+    if ".gz" in filepath:
+        read_csv_params["compression"] = "gzip"
+
+    def _read_csv(header: int | None = None) -> pd.DataFrame:
         return pd.read_csv(**read_csv_params, header=header)
 
     # If header_row is provided, use it directly
@@ -66,11 +59,13 @@ def read_ohlc_csv(
     else:
         # User doesn't specify header - let's try reading without header first
         try:
+            bound_logger.debug("Trying to read file without header")
             df = _read_csv(header=None)
         except FileNotFoundError as e:
             raise FileNotFoundError(f"File not found: {filepath}") from e
         except ValueError:
             # If that fails, try with header
+            bound_logger.debug("Trying to read file with header")
             try:
                 df = _read_csv(header=0)
             except ValueError as e:
@@ -81,7 +76,7 @@ def read_ohlc_csv(
                 ) from e
 
     bound_logger.debug(
-        f"Read {df.shape[0]} rows and {df.shape[1]} columns: {df.columns.tolist()}"
+        "Read {} rows and {} columns: {}", df.shape[0], df.shape[1], df.columns.tolist()
     )
 
     # Infer time step from data

@@ -1,4 +1,4 @@
-"""This module contains tests for the timeframes module."""
+"""Tests for the timeframes module."""
 
 import unittest
 from unittest.mock import Mock
@@ -64,6 +64,14 @@ class TestTimeframes(unittest.TestCase):
         for seconds, expected_timeframe in test_cases.items():
             with self.subTest(seconds=seconds):
                 self.assertEqual(format_timeframe(seconds), expected_timeframe)
+
+    def test_format_timeframe_with_string_input(self):
+        """Test formatting timeframes with string input."""
+        for seconds, expected_timeframe in common_timeframes_reversed.items():
+            with self.subTest(seconds=seconds):
+                self.assertEqual(
+                    format_timeframe(expected_timeframe), expected_timeframe
+                )
 
     def test_validate_timeframe_format(self):
         """Test validating timeframe format."""
