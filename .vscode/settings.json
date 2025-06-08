@@ -16,6 +16,7 @@
         "loguru",
         "lowerbound",
         "mccabe",
+        "mypy",
         "nans",
         "numpy",
         "ohlc",
