@@ -33,7 +33,7 @@ jobs:
 
       - name: MyPy check
         run: |
-          poetry run mypy . --ignore-missing-imports --check-untyped-defs
+          poetry run mypy . --ignore-missing-imports --check-untyped-defs --install-types --non-interactive
 
       - name: Run tests with pytest
         run: |
