@@ -1,10 +1,9 @@
 """Module for loading OHLC data from a CSV file."""
 
-from typing import Optional
 
 import pandas as pd
 
-from ohlc_toolkit.config import DEFAULT_DTYPE, DEFAULT_COLUMNS
+from ohlc_toolkit.config import DEFAULT_COLUMNS, DEFAULT_DTYPE
 from ohlc_toolkit.config.log_config import get_logger
 from ohlc_toolkit.timeframes import (
     parse_timeframe,
@@ -18,11 +17,11 @@ LOGGER = get_logger(__name__)
 
 def read_ohlc_csv(
     filepath: str,
-    timeframe: Optional[str] = None,
+    timeframe: str | None = None,
     *,
-    header_row: Optional[int] = None,
-    columns: Optional[list[str]] = None,
-    dtype: Optional[dict[str, str]] = None,
+    header_row: int | None = None,
+    columns: list[str] | None = None,
+    dtype: dict[str, str] | None = None,
 ) -> pd.DataFrame:
     """Read OHLC data from a CSV file.
 
@@ -35,6 +34,7 @@ def read_ohlc_csv(
 
     Returns:
         pd.DataFrame: Processed OHLC dataset.
+
     """
     bound_logger = LOGGER.bind(body=filepath)
     bound_logger.info("Reading OHLC data")
@@ -51,7 +51,7 @@ def read_ohlc_csv(
     if ".gz" in filepath:
         read_csv_params["compression"] = "gzip"
 
-    def _read_csv(header: Optional[int] = None) -> pd.DataFrame:
+    def _read_csv(header: int | None = None) -> pd.DataFrame:
         return pd.read_csv(**read_csv_params, header=header)
 
     # If header_row is provided, use it directly

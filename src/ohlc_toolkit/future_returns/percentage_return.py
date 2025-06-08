@@ -1,10 +1,11 @@
-"""This module contains functions for calculating percentage returns."""
+"""Functions for calculating percentage returns."""
 
 import pandas as pd
+
 from ohlc_toolkit.pandas_ta.percent_return import percent_return
 
 
-def calculate_percentage_return(
+def calculate_percentage_return(  # noqa: PLR0913
     close: pd.Series,
     *,
     timestep_size: int,
@@ -25,6 +26,7 @@ def calculate_percentage_return(
 
     Returns:
         pd.Series: The calculated percentage return.
+
     """
     # Calculate the length for percent return
     length = future_return_length // timestep_size

@@ -1,4 +1,4 @@
-"""This module contains the percent_return function from pandas-ta."""
+"""Percent Return from pandas-ta."""
 
 from numpy import nan, roll
 from pandas import Series
@@ -31,6 +31,7 @@ def percent_return(
 
     Returns:
         pd.Series: New feature generated.
+
     """
     # Validate
     length = v_pos_default(length, 1)

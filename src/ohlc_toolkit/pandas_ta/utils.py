@@ -1,4 +1,4 @@
-"""This module contains utility functions from pandas-ta."""
+"""Utility functions from pandas-ta."""
 
 from functools import partial
 from typing import Any
@@ -11,14 +11,20 @@ IntFloat = int | float
 
 
 def v_bool(var: bool | Any, default: bool = True) -> bool:
-    """Returns default=True if var is not a bool."""
+    """Validate the var is a bool.
+
+    Returns the default if var is not a bool.
+    """
     if isinstance(var, bool):
         return var
     return default
 
 
 def v_int(var: int, default: int, ne: int | None = 0) -> int:
-    """Returns the default if var is not equal to the ne value."""
+    """Validate the var is not equal to the ne value.
+
+    Returns the default if var is not equal to the ne value.
+    """
     if isinstance(var, int) and int(var) != int(ne):
         return int(var)
     if isinstance(var, np_integer) and var.item() != int(ne):
@@ -38,11 +44,26 @@ def v_lowerbound(
     strict: bool = True,
     complement: bool = False,
 ) -> IntFloat:
-    """Returns the default if var is not greater(equal) than bound."""
+    """Validate the var is greater than bound.
+
+    Returns the default if var is not greater than bound. If strict is False,
+    the var is also allowed to be equal to the bound.
+
+    Args:
+        var (IntFloat): The variable to validate.
+        bound (IntFloat): The bound to validate against.
+        default (IntFloat): The default value to return if the var is not greater (or equal) than bound.
+        strict (bool): Whether to use strict comparison.
+        complement (bool): Whether to complement the validation.
+
+    Returns:
+        IntFloat: The validated var.
+
+    """
     var_type = None
-    if isinstance(var, (float, np_floating)):
+    if isinstance(var, float | np_floating):
         var_type = float
-    if isinstance(var, (int, np_integer)):
+    if isinstance(var, int | np_integer):
         var_type = int
 
     if var_type is None:
@@ -65,14 +86,28 @@ def v_lowerbound(
 def v_pos_default(
     var: IntFloat, default: IntFloat = 0, strict: bool = True, complement: bool = False
 ) -> IntFloat:
-    """Returns the default if var is not greater than 0."""
+    """Validate the var is greater than 0.
+
+    Returns the default if var is not greater than 0.
+    """
     return partial(v_lowerbound, bound=0)(
         var=var, default=default, strict=strict, complement=complement
     )
 
 
 def v_series(series: Series, length: IntFloat | None = 0) -> Series | None:
-    """Returns None if the Pandas Series does not meet the minimum length required for the indicator."""
+    """Validate the series and length required for the indicator.
+
+    Returns None if the Pandas Series does not meet the minimum length required for the indicator.
+
+    Args:
+        series (Series): The series to validate.
+        length (IntFloat | None): The minimum length required for the indicator.
+
+    Returns:
+        Series | None: The validated series or None if the series does not meet the minimum length.
+
+    """
     if series is not None and isinstance(series, Series):
         if series.size >= v_pos_default(length, 0):
             return series

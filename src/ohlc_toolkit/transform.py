@@ -2,7 +2,6 @@
 
 import os
 from logging import Logger
-from typing import Union
 
 import pandas as pd
 
@@ -24,7 +23,7 @@ def _last(row: pd.Series) -> float:
 
 
 def rolling_ohlc(df_input: pd.DataFrame, timeframe_minutes: int) -> pd.DataFrame:
-    """Rolling OHLC aggregation.
+    """Apply rolling OHLC aggregation.
 
     Args:
         df_input (pd.DataFrame): The input DataFrame with OHLC data.
@@ -32,6 +31,7 @@ def rolling_ohlc(df_input: pd.DataFrame, timeframe_minutes: int) -> pd.DataFrame
 
     Returns:
         pd.DataFrame: The aggregated OHLC data, with same schema as the input DataFrame.
+
     """
     LOGGER.info(
         "Calculating OHLC using a {}-minute rolling window over {} rows.",
@@ -61,6 +61,7 @@ def _cast_to_original_dtypes(
 
     Returns:
         pd.DataFrame: The transformed DataFrame with data types matching the original.
+
     """
     LOGGER.debug("Casting transformed DataFrame to original dtypes")
     for column in transformed_df.columns:
@@ -84,6 +85,7 @@ def _drop_expected_nans(df: pd.DataFrame, logger: Logger) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: The DataFrame with expected NaNs dropped.
+
     """
     logger.debug("Dropping expected NaN values from the aggregated DataFrame")
     n = df.first_valid_index()  # Get the index of the first valid row
@@ -98,7 +100,7 @@ def _drop_expected_nans(df: pd.DataFrame, logger: Logger) -> pd.DataFrame:
 
 
 def transform_ohlc(
-    df_input: pd.DataFrame, timeframe: Union[int, str], step_size_minutes: int = 1
+    df_input: pd.DataFrame, timeframe: int | str, step_size_minutes: int = 1
 ) -> pd.DataFrame:
     """Transform OHLC data to a different timeframe resolution.
 
@@ -110,6 +112,7 @@ def transform_ohlc(
 
     Returns:
         pd.DataFrame: Transformed OHLC data.
+
     """
     df = df_input.copy()
     bound_logger = LOGGER.bind(
@@ -144,7 +147,7 @@ def transform_ohlc(
 
     # The following default was determined to be where chunk-based aggregation is faster
     # than rolling aggregation. See examples/experiment/chunk_vs_rolling_aggregation.py
-    chunk_cut_off = int(os.getenv("CHUNK_CUT_OFF", 18000))
+    chunk_cut_off = int(os.getenv("CHUNK_CUT_OFF", "18000"))
     num_rows = len(df)
     num_chunks = num_rows // step_size_minutes
     if step_size_minutes == 1 or num_chunks > chunk_cut_off:
@@ -203,7 +206,7 @@ def transform_ohlc(
         df_agg = _drop_expected_nans(df_agg, bound_logger)
     except ValueError as e:
         raise ValueError(
-            f"{str(e)} Please ensure your dataset is big enough "
+            f"{e!s} Please ensure your dataset is big enough "
             f"for this timeframe: {timeframe} ({timeframe_minutes} minutes)."
         ) from e
 

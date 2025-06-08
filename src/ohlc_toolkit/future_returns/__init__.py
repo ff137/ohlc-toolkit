@@ -1,1 +1,1 @@
-"""This module contains functions for retroactively calculating future returns."""
+"""Functions for retroactively calculating future returns."""
