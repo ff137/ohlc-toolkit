@@ -3,27 +3,36 @@
 import re
 from logging import Logger
 
+MINUTE_SECONDS = 60
+HOUR_MINUTES = 60
+DAY_HOURS = 24
+WEEK_DAYS = 7
+
+HOUR_SECONDS = MINUTE_SECONDS * HOUR_MINUTES
+DAY_SECONDS = HOUR_SECONDS * DAY_HOURS
+WEEK_SECONDS = DAY_SECONDS * WEEK_DAYS
+
 # Predefined common timeframes for faster lookup
 COMMON_TIMEFRAMES = {
-    "1m": 60,
-    "3m": 180,
-    "5m": 300,
-    "15m": 900,
-    "30m": 1800,
-    "1h": 3600,
-    "2h": 7200,
-    "4h": 14400,
-    "6h": 21600,
-    "8h": 28800,
-    "12h": 43200,
-    "1d": 86400,
-    "2d": 172800,
-    "3d": 259200,
-    "4d": 345600,
-    "1w": 604800,
-    "2w": 1209600,
-    "3w": 1814400,
-    "4w": 2419200,
+    "1m": MINUTE_SECONDS,
+    "3m": MINUTE_SECONDS * 3,
+    "5m": MINUTE_SECONDS * 5,
+    "15m": MINUTE_SECONDS * 15,
+    "30m": MINUTE_SECONDS * 30,
+    "1h": HOUR_SECONDS,
+    "2h": HOUR_SECONDS * 2,
+    "4h": HOUR_SECONDS * 4,
+    "6h": HOUR_SECONDS * 6,
+    "8h": HOUR_SECONDS * 8,
+    "12h": HOUR_SECONDS * 12,
+    "1d": DAY_SECONDS,
+    "2d": DAY_SECONDS * 2,
+    "3d": DAY_SECONDS * 3,
+    "4d": DAY_SECONDS * 4,
+    "1w": WEEK_SECONDS,
+    "2w": WEEK_SECONDS * 2,
+    "3w": WEEK_SECONDS * 3,
+    "4w": WEEK_SECONDS * 4,
 }
 
 # Regex pattern to parse timeframe strings
@@ -32,11 +41,11 @@ TIMEFRAME_FORMAT_PATTERN = re.compile(r"^(\d+[wdhms])+$", re.IGNORECASE)
 
 # Unit conversion
 TIME_UNITS = {
-    "w": 604800,  # Weeks to seconds
-    "d": 86400,  # Days to seconds
-    "h": 3600,  # Hours to seconds
-    "m": 60,  # Minutes to seconds
-    "s": 1,  # Seconds to seconds
+    "w": WEEK_SECONDS,
+    "d": DAY_SECONDS,
+    "h": HOUR_SECONDS,
+    "m": MINUTE_SECONDS,
+    "s": 1,
 }
 
 
@@ -81,7 +90,13 @@ def format_timeframe(seconds: int | str) -> str:
         # Return predefined common timeframes if found
         return {v: k for k, v in COMMON_TIMEFRAMES.items()}[seconds]
 
-    units = [("w", 604800), ("d", 86400), ("h", 3600), ("m", 60), ("s", 1)]
+    units = [
+        ("w", WEEK_SECONDS),
+        ("d", DAY_SECONDS),
+        ("h", HOUR_SECONDS),
+        ("m", MINUTE_SECONDS),
+        ("s", 1),
+    ]
     parts = []
 
     for unit, unit_seconds in units:
