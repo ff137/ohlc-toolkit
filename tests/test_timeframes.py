@@ -65,6 +65,14 @@ class TestTimeframes(unittest.TestCase):
             with self.subTest(seconds=seconds):
                 self.assertEqual(format_timeframe(seconds), expected_timeframe)
 
+    def test_format_timeframe_with_string_input(self):
+        """Test formatting timeframes with string input."""
+        for seconds, expected_timeframe in common_timeframes_reversed.items():
+            with self.subTest(seconds=seconds):
+                self.assertEqual(
+                    format_timeframe(expected_timeframe), expected_timeframe
+                )
+
     def test_validate_timeframe_format(self):
         """Test validating timeframe format."""
         valid_timeframes = ["1m", "2h", "3d", "4w", "1h30m", "2d3h", "1w2d"]

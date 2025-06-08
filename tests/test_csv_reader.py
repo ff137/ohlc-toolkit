@@ -1,9 +1,11 @@
 """This module contains the tests for the ohlc_toolkit.csv_reader module."""
 
 import unittest
+from unittest.mock import patch
 
 import pandas as pd
 
+from ohlc_toolkit.config import DEFAULT_COLUMNS, DEFAULT_DTYPE
 from ohlc_toolkit.csv_reader import read_ohlc_csv
 
 
@@ -95,6 +97,20 @@ class TestCsvReader(unittest.TestCase):
         """Test reading a CSV file with a non-multiple timeframe."""
         df = read_ohlc_csv(self.csv_data_no_header_path, timeframe="70s")
         pd.testing.assert_frame_equal(df, self.df_expected)
+
+    @patch("pandas.read_csv")
+    def test_read_ohlc_csv_with_gzip_compression(self, mock_read_csv):
+        """Test reading a CSV file with gzip compression."""
+        with patch("ohlc_toolkit.csv_reader.infer_time_step") as mock_infer_time_step:
+            read_ohlc_csv("test_csv_data.gz")
+            mock_read_csv.assert_called_once_with(
+                filepath_or_buffer="test_csv_data.gz",
+                names=DEFAULT_COLUMNS,
+                dtype=DEFAULT_DTYPE,
+                header=None,
+                compression="gzip",
+            )
+        assert mock_infer_time_step.call_count == 1
 
 
 if __name__ == "__main__":
